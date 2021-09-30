@@ -1,8 +1,3 @@
--- module Main where
-
--- main :: IO ()
--- main = putStrLn "Hello, Haskell!"
-
 data Nat = Zero | Succ Nat deriving (Eq, Show)
 
 -- Expression
