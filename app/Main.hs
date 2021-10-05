@@ -1,6 +1,11 @@
 -- | This is the entrypoint.
 
-module Main where
+-- module Main where
 
-main :: IO ()
-main = print "EpsilonX!"
+-- import Experiments.Tests
+
+-- main :: IO ()
+-- -- main = defaultMain tests
+-- main = do
+--     print tests
+
