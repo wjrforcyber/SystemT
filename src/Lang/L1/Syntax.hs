@@ -2,10 +2,8 @@
 
 module Lang.L1.Syntax where
 
-import GHC.Generics
 data Exp = Zero
          | Succ Exp
          | Add Exp Exp
          | Mul Exp Exp
   deriving (Eq,Show)
-

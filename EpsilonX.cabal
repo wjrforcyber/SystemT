@@ -1,49 +1,43 @@
 cabal-version:      2.4
 name:               EpsilonX
 version:            0.1.0.0
-
--- A short (one-line) description of the package.
--- synopsis:
-
--- A longer description of the package.
--- description:
-
--- A URL where users can report bugs.
--- bug-reports:
-license:            NONE
-author:             wjrforcyber
 maintainer:         wjrforcyber@163.com
-
--- A copyright notice.
--- copyright:
--- category:
+author:             wjrforcyber
 extra-source-files:
     CHANGELOG.md
     README.md
 
-executable EpsilonX
-    main-is:          Experiments/Tests.hs
+common common-deps
+  default-language: Haskell2010
+  build-depends:
+    base >=4.12 && <= 5
+  ghc-options:
+    -Wall
+    -Wextra
 
-    -- Modules included in this executable, other than Main.
-    other-modules:    
-
+library
+    import: common-deps
+    exposed-modules:
         Common.Types
-        -- L1
         Lang.L1.Syntax
         Lang.L1.Eval
-        -- Experiments
-        -- Experiments.Tests
+        Experiments.Tests
+    hs-source-dirs:   src
 
-    -- LANGUAGE extensions used by modules in this package.
-    -- other-extensions:
-    build-depends:    tasty == 1.4.2,
-                      tasty-smallcheck==0.8.2,
-                      smallcheck == 1.2.1,
-                      mtl==2.2.2,
-                      QuickCheck == 2.14.2,
-                      tasty-quickcheck==0.10.1.2,
-                      tasty-hunit==0.10.0.3,
-                      tasty-hspec == 1.2,
-                      base >=4
-    hs-source-dirs:   app
-    default-language: Haskell2010
+executable main
+    import:         common-deps
+    main-is:        Main.hs
+    hs-source-dirs: src
+    ghc-options:    -threaded
+
+test-suite test
+    import:         common-deps
+    type:           exitcode-stdio-1.0
+    main-is:        Test.hs
+    hs-source-dirs: tests
+    build-depends:
+        EpsilonX,
+        tasty >= 1.4.2,
+        tasty-hunit >= 0.10.0.3,
+        tasty-quickcheck >= 0.10.1.2,
+        QuickCheck >= 2.14.2
