@@ -28,3 +28,4 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-${{ matrix.ghc }}-
       - run: cabal v2-build $CONFIG
+      - run: cabal v2-test
