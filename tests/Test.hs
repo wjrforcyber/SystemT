@@ -11,32 +11,39 @@ import Test.Tasty.QuickCheck as QC
 main :: IO ()
 main = defaultMain tests
 
--- QuickCheck instance
-gExp :: Gen Exp
-gExp = oneof [pure Zero, Succ <$> gExp]
-
 instance Arbitrary Exp where
-  arbitrary = gExp
+  arbitrary = sized arbExp
+
+arbExp :: Int -> Gen Exp
+arbExp 0 = oneof [pure Zero, Succ <$> arbitrary]
+arbExp n | n > 0 = do
+  (Positive m) <- arbitrary
+  let subExp = arbExp (n `div` (m + 1))
+  oneof [pure Zero, Succ <$> subExp, Add <$> subExp <*> subExp, Mul <$> subExp <*> subExp]
 
 tests :: TestTree
-tests = testGroup "Tests" [properties, unitTests]
+tests = testGroup "Tests" [propertyTests, unitTests]
 
-properties :: TestTree
-properties = testGroup "Properties" [qcProps]
+propertyTests :: TestTree
+propertyTests = testGroup "Property tests" [qcProps]
 
+qcProps :: TestTree
 qcProps =
   testGroup
-    "(Checked by QucikCheck)"
-    [ QC.testProperty "Evaluate Zero" $
+    "QuickCheck tests"
+    [ QC.testProperty "Zero" $
         (eval (Zero :: Exp)) == 0,
       QC.testProperty "Succ" $
         \x -> (eval (x :: Exp)) + 1 == ((eval (Succ (x))) :: Int),
-      -- the following property does not hold
       QC.testProperty "Addition" $
         \x y ->
-          (eval (x :: Exp)) + (eval (y :: Exp)) == (eval (Add x y) :: Int)
+          (eval (x :: Exp)) + (eval (y :: Exp)) == (eval (Add x y) :: Int),
+      QC.testProperty "Multiplication" $
+        \x y ->
+          (eval (x :: Exp)) * (eval (y :: Exp)) == (eval (Mul x y) :: Int)
     ]
 
+unitTests :: TestTree
 unitTests =
   testGroup
     "Unit tests"
