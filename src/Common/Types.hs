@@ -3,8 +3,6 @@ module Common.Types where
 
 import Numeric.Natural
 import Test.QuickCheck
-import Text.Parsec
-import Text.Parsec.String
 
 data Nat = Zero | Succ Nat deriving (Eq, Ord)
 
@@ -41,6 +39,3 @@ instance Num Nat where
 instance Arbitrary Nat where
   arbitrary = fromNatural <$> arbitrarySizedNatural
   shrink = fmap fromNatural . shrinkIntegral . toNatural
-
-natP :: Parser Nat
-natP = read <$> many1 digit
