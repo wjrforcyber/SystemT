@@ -5,11 +5,9 @@ module Lang.L1.Syntax where
 
 
 import Common.Types
-
 import Prettyprinter ((<+>))
 import qualified Prettyprinter as PP
-
-import Text.Parsec          hiding(Error)
+import Text.Parsec
 import Text.Parsec.Expr
 import Text.Parsec.Language (emptyDef)
 import Text.Parsec.String
@@ -60,6 +58,8 @@ parseExp = buildExpressionParser table parseAtom <?> "expression"
 parseLang :: Parser Exp
 parseLang = whiteSpace *> parseExp <* eof
 
+-- Prettyprinter for Exp
+-- TODO: Print minimal number of parentheses
 
 instance PP.Pretty Exp where
   pretty = prettyExp
