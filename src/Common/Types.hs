@@ -37,6 +37,8 @@ instance Num Nat where
 
   negate = id
 
+
+
 instance Arbitrary Nat where
   arbitrary = fromNatural <$> arbitrarySizedNatural
   shrink = fmap fromNatural . shrinkIntegral . toNatural

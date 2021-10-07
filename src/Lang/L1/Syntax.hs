@@ -1,4 +1,3 @@
-{-# LANGUAGE GADTs #-}
 -- | This is the Syntax of L1.
 module Lang.L1.Syntax where
 
@@ -61,6 +60,7 @@ parseLang = whiteSpace *> parseExp <* eof
 -- Prettyprinter for Exp
 -- TODO: Print minimal number of parentheses
 
+
 instance PP.Pretty Exp where
   pretty = prettyExp
 
@@ -69,9 +69,9 @@ prettyExp (ENat n)     = PP.pretty n
 prettyExp (EAdd e1 e2) = PP.parens (prettyExp e1 <+> PP.pretty "+" <+> prettyExp e2)
 prettyExp (EMul e1 e2) = PP.parens (prettyExp e1 <+> PP.pretty "*" <+> prettyExp e2)
 
-exec :: String -> IO ()
-exec s =
-    case parse parseExp "" s of
-        Left err -> print err
-        Right prog -> do
-          putStrLn $ show $ prettyExp $ prog
+-- exec :: String -> String
+-- exec s =
+--     case parse parseExp "" s of
+--         Left err -> print err
+--         Right prog -> do
+--           putStrLn $ show $ prettyExp $ prog

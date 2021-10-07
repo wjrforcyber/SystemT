@@ -4,6 +4,8 @@ module Main where
 import Common.Types
 import Lang.L1.Eval
 import Lang.L1.Syntax
+import Text.Parsec
+
 import Test.QuickCheck.Gen
 import Test.Tasty
 import Test.Tasty.HUnit
@@ -16,11 +18,8 @@ instance Arbitrary Exp where
   arbitrary = sized arbExp
 
 arbExp :: Int -> Gen Exp
-arbExp 0 = oneof [pure Zero),Succ <$> arbitrary]
-arbExp n | n > 0 = do
-  (Positive m) <- arbitrary
-  let subExp = arbExp (n `div` (m + 1))
-  oneof [pure Zero, Succ <$> subExp, EAdd <$> subExp <*> subExp, EMul <$> subExp <*> subExp]
+arbExp n = oneof [ENat <$> arbitrary]
+
 
 tests :: TestTree
 tests = testGroup "Tests" [propertyTests, unitTests]
@@ -32,27 +31,24 @@ qcProps :: TestTree
 qcProps =
   testGroup
     "QuickCheck tests"
-    [ QC.testProperty "Zero" $
-        eval (Zero :: Exp) == 0,
-      QC.testProperty "Succ" $
-        \x -> eval (x :: Exp) + 1 == (eval (Succ x) :: Int),
+    [ QC.testProperty "ENat->Nat" $
+        \x -> eval ((ENat x) :: Exp)  == (x :: Nat),
       QC.testProperty "Addition" $
         \x y ->
-          eval (x :: Exp) + eval (y :: Exp) == (eval (EAdd x y) :: Int),
+          eval (x :: Exp) + eval (y :: Exp) == (eval (EAdd x y) :: Nat),
       QC.testProperty "Multiplication" $
         \x y ->
-          eval (x :: Exp) * eval (y :: Exp) == (eval (EMul x y) :: Int)
-    ]
+          eval (x :: Exp) * eval (y :: Exp) == (eval (EMul x y) :: Nat)]
 
 unitTests :: TestTree
 unitTests =
   testGroup
     "Unit tests"
     [ testCase "Zero" $
-        eval Zero @?= 0,
-      testCase "Succ" $
-        eval (Succ (Succ (Succ Zero))) @?= ((1 + eval (Succ (Succ Zero))) :: Int),
+        eval (ENat Zero) @?= 0,
+      testCase "Exp -> Nat" $
+        eval (ENat 3) @?= 3,
       testCase "Addition" $
-        eval (Succ (Succ (Succ Zero))) + eval (Succ (Succ Zero)) @?= (eval (Succ (Succ (Succ (Succ (Succ Zero))))) :: Int)
-    ]
-
+        eval (EAdd (ENat 2) (ENat 3)) @?= 5,
+      testCase "Nultiplucation"$
+        eval (EMul (ENat 2) (ENat 3)) @?= 6]
