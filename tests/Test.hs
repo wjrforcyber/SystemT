@@ -1,6 +1,7 @@
 -- | This is a test suite.
 module Main where
 
+import Common.Types
 import Lang.L1.Eval
 import Lang.L1.Syntax
 import Test.QuickCheck.Gen
@@ -15,11 +16,11 @@ instance Arbitrary Exp where
   arbitrary = sized arbExp
 
 arbExp :: Int -> Gen Exp
-arbExp 0 = oneof [pure Zero, Succ <$> arbitrary]
+arbExp 0 = oneof [pure Zero),Succ <$> arbitrary]
 arbExp n | n > 0 = do
   (Positive m) <- arbitrary
   let subExp = arbExp (n `div` (m + 1))
-  oneof [pure Zero, Succ <$> subExp, Add <$> subExp <*> subExp, Mul <$> subExp <*> subExp]
+  oneof [pure Zero, Succ <$> subExp, EAdd <$> subExp <*> subExp, EMul <$> subExp <*> subExp]
 
 tests :: TestTree
 tests = testGroup "Tests" [propertyTests, unitTests]
@@ -37,10 +38,10 @@ qcProps =
         \x -> eval (x :: Exp) + 1 == (eval (Succ x) :: Int),
       QC.testProperty "Addition" $
         \x y ->
-          eval (x :: Exp) + eval (y :: Exp) == (eval (Add x y) :: Int),
+          eval (x :: Exp) + eval (y :: Exp) == (eval (EAdd x y) :: Int),
       QC.testProperty "Multiplication" $
         \x y ->
-          eval (x :: Exp) * eval (y :: Exp) == (eval (Mul x y) :: Int)
+          eval (x :: Exp) * eval (y :: Exp) == (eval (EMul x y) :: Int)
     ]
 
 unitTests :: TestTree
@@ -54,3 +55,4 @@ unitTests =
       testCase "Addition" $
         eval (Succ (Succ (Succ Zero))) + eval (Succ (Succ Zero)) @?= (eval (Succ (Succ (Succ (Succ (Succ Zero))))) :: Int)
     ]
+

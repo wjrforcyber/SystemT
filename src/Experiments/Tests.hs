@@ -119,15 +119,15 @@ test5 = Add (I 9) (I 6)
 
 test6 = Lam "x" (Lam "y" (Add (Var "x") (Var "y"))) |> I 9 |> I 6
 
--- main = do
---         --  TODO:
---         -- test1 Just make sure defination of Nat and Mul is working fine but there is no evaluation,
---         -- how to change Nat->Nat->Nat to Val->Val->Maybe Val?
---          print $test1
+main = do
+        --  TODO:
+        -- test1 Just make sure defination of Nat and Mul is working fine but there is no evaluation,
+        -- how to change Nat->Nat->Nat to Val->Val->Maybe Val?
+         print $test1
 
---         -- These are fine :)
---          print $ eval test2
---          print $ eval test3
---          print $ eval test4
---          print $ eval test5
---          print $ eval test6
+        -- These are fine :)
+         print $ eval test2
+         print $ eval test3
+         print $ eval test4
+         print $ eval test5
+         print $ eval test6

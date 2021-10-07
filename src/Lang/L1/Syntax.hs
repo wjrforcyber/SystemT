@@ -1,8 +1,15 @@
+{-# LANGUAGE GADTs #-}
 -- | This is the Syntax of L1.
 module Lang.L1.Syntax where
 
+
+
 import Common.Types
-import Text.Parsec
+
+import Prettyprinter ((<+>))
+import qualified Prettyprinter as PP
+
+import Text.Parsec          hiding(Error)
 import Text.Parsec.Expr
 import Text.Parsec.Language (emptyDef)
 import Text.Parsec.String
@@ -52,3 +59,19 @@ parseExp = buildExpressionParser table parseAtom <?> "expression"
 
 parseLang :: Parser Exp
 parseLang = whiteSpace *> parseExp <* eof
+
+
+instance PP.Pretty Exp where
+  pretty = prettyExp
+
+prettyExp :: Exp -> PP.Doc ann
+prettyExp (ENat n)     = PP.pretty n
+prettyExp (EAdd e1 e2) = PP.parens (prettyExp e1 <+> PP.pretty "+" <+> prettyExp e2)
+prettyExp (EMul e1 e2) = PP.parens (prettyExp e1 <+> PP.pretty "*" <+> prettyExp e2)
+
+exec :: String -> IO ()
+exec s =
+    case parse parseExp "" s of
+        Left err -> print err
+        Right prog -> do
+          putStrLn $ show $ prettyExp $ prog
