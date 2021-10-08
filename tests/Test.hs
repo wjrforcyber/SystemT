@@ -18,12 +18,11 @@ instance Arbitrary Exp where
   arbitrary = sized arbExp
 
 arbExp :: Int -> Gen Exp
-arbExp 0 = oneof [pure (ENat Zero), ENat <$> arbitrary]
+arbExp 0 = ENat <$> arbitrary
 arbExp n | n > 0 = do
   (Positive m) <- arbitrary
   let subExp = arbExp (n `div` (m + 1))
   oneof [subExp, EAdd <$> subExp <*> subExp, EMul <$> subExp <*> subExp]
-
 
 tests :: TestTree
 tests = testGroup "Tests" [propertyTests, unitTests]
