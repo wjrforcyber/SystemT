@@ -1,56 +1,75 @@
+{-# LANGUAGE ScopedTypeVariables #-}
+
 -- | This is a test suite.
 module Main where
 
+import Common.Types
 import Lang.L1.Eval
 import Lang.L1.Syntax
-import Test.QuickCheck.Gen
+import qualified Prettyprinter as PP
 import Test.Tasty
 import Test.Tasty.HUnit
 import Test.Tasty.QuickCheck as QC
+import qualified Text.Parsec as P
 
 main :: IO ()
 main = defaultMain tests
 
-instance Arbitrary Exp where
-  arbitrary = sized arbExp
+parse :: String -> Either P.ParseError Exp
+parse = P.parse parseExp ""
 
-arbExp :: Int -> Gen Exp
-arbExp 0 = oneof [pure Zero, Succ <$> arbitrary]
-arbExp n | n > 0 = do
-  (Positive m) <- arbitrary
-  let subExp = arbExp (n `div` (m + 1))
-  oneof [pure Zero, Succ <$> subExp, Add <$> subExp <*> subExp, Mul <$> subExp <*> subExp]
+pp :: Exp -> String
+pp = show . PP.pretty
 
 tests :: TestTree
 tests = testGroup "Tests" [propertyTests, unitTests]
 
 propertyTests :: TestTree
-propertyTests = testGroup "Property tests" [qcProps]
+propertyTests = testGroup "Property tests" [evalProps, parserProps]
 
-qcProps :: TestTree
-qcProps =
+evalProps :: TestTree
+evalProps =
   testGroup
-    "QuickCheck tests"
-    [ QC.testProperty "Zero" $
-        eval (Zero :: Exp) == 0,
-      QC.testProperty "Succ" $
-        \x -> eval (x :: Exp) + 1 == (eval (Succ x) :: Int),
-      QC.testProperty "Addition" $
-        \x y ->
-          eval (x :: Exp) + eval (y :: Exp) == (eval (Add x y) :: Int),
-      QC.testProperty "Multiplication" $
-        \x y ->
-          eval (x :: Exp) * eval (y :: Exp) == (eval (Mul x y) :: Int)
+    "eval"
+    [ QC.testProperty "eval of Nat is itself" $
+        \(x :: Nat) -> eval (ENat x) == x,
+      QC.testProperty "eval of Add is +" $
+        \(x :: Exp) (y :: Exp) ->
+          eval x + eval y == eval (EAdd x y),
+      QC.testProperty "eval of Mul is *" $
+        \(x :: Exp) (y :: Exp) ->
+          eval x * eval y == eval (EMul x y)
+    ]
+
+parserProps :: TestTree
+parserProps =
+  testGroup
+    "parse/prettyprint"
+    [ QC.testProperty "parse . pp is identity" $
+        \(e :: Exp) -> (parse . pp) e == Right e
     ]
 
 unitTests :: TestTree
-unitTests =
+unitTests = testGroup "Unit tests" [evalUnitTests, parserUnitTests]
+
+evalUnitTests :: TestTree
+evalUnitTests =
   testGroup
-    "Unit tests"
+    "eval"
     [ testCase "Zero" $
-        eval Zero @?= 0,
-      testCase "Succ" $
-        eval (Succ (Succ (Succ Zero))) @?= ((1 + eval (Succ (Succ Zero))) :: Int),
+        eval (ENat Zero) @?= 0,
+      testCase "Nat" $
+        eval (ENat 3) @?= 3,
       testCase "Addition" $
-        eval (Succ (Succ (Succ Zero))) + eval (Succ (Succ Zero)) @?= (eval (Succ (Succ (Succ (Succ (Succ Zero))))) :: Int)
+        eval (EAdd (EMul (ENat 2) (ENat 3)) (ENat 3)) @?= 9,
+      testCase "Multiplication" $
+        eval (EMul (ENat 2) (ENat 3)) @?= 6
+    ]
+
+parserUnitTests :: TestTree
+parserUnitTests =
+  testGroup
+    "parser"
+    [ testCase "2 + 3 * 4" $
+        parse "2 + 3 * 4" @?= Right (EAdd (ENat 2) (EMul (ENat 3) (ENat 4)))
     ]
