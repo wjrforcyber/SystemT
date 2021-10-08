@@ -9,6 +9,7 @@ import Text.Parsec.Expr
 import Text.Parsec.Language (emptyDef)
 import Text.Parsec.String
 import qualified Text.Parsec.Token as P
+import Test.QuickCheck
 
 data Exp
   = ENat Nat
@@ -65,3 +66,13 @@ prettyExp :: Exp -> PP.Doc ann
 prettyExp (ENat n)     = PP.pretty n
 prettyExp (EAdd e1 e2) = PP.parens (prettyExp e1 <+> PP.pretty "+" <+> prettyExp e2)
 prettyExp (EMul e1 e2) = PP.parens (prettyExp e1 <+> PP.pretty "*" <+> prettyExp e2)
+
+instance Arbitrary Exp where
+  arbitrary = sized arbExp
+
+arbExp :: Int -> Gen Exp
+arbExp 0 = ENat <$> arbitrary `suchThat` \n -> n < 30
+arbExp n = do
+  (Positive m) <- arbitrary
+  let subExp = arbExp (n `div` (m + 1))
+  oneof [subExp, EAdd <$> subExp <*> subExp, EMul <$> subExp <*> subExp]
