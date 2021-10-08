@@ -18,7 +18,11 @@ instance Arbitrary Exp where
   arbitrary = sized arbExp
 
 arbExp :: Int -> Gen Exp
-arbExp n = oneof [ENat <$> arbitrary]
+arbExp 0 = oneof [pure (ENat Zero), ENat <$> arbitrary]
+arbExp n | n > 0 = do
+  (Positive m) <- arbitrary
+  let subExp = arbExp (n `div` (m + 1))
+  oneof [subExp, EAdd <$> subExp <*> subExp, EMul <$> subExp <*> subExp]
 
 
 tests :: TestTree
@@ -38,7 +42,7 @@ qcProps =
           eval (x :: Exp) + eval (y :: Exp) == (eval (EAdd x y) :: Nat),
       QC.testProperty "Multiplication" $
         \x y ->
-          eval (x :: Exp) * eval (y :: Exp) == (eval (EMul x y) :: Nat)]
+          eval (x :: Exp) * eval (y :: Exp) == (eval (EMul x y) :: Nat) ]
 
 unitTests :: TestTree
 unitTests =
@@ -49,6 +53,6 @@ unitTests =
       testCase "Exp -> Nat" $
         eval (ENat 3) @?= 3,
       testCase "Addition" $
-        eval (EAdd (ENat 2) (ENat 3)) @?= 5,
+        eval (EAdd (EMul (ENat 2) (ENat 3)) (ENat 3)) @?= 9,
       testCase "Nultiplucation"$
         eval (EMul (ENat 2) (ENat 3)) @?= 6]
