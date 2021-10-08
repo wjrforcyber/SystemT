@@ -38,9 +38,11 @@ evalProps =
           eval x + eval y == eval (EAdd x y),
       QC.testProperty "eval of Mul is *" $
         \(x :: Exp) (y :: Exp) ->
-          eval x * eval y == eval (EMul x y),
-      QC.testProperty "eval of opt" $
-        \(e :: Exp) -> eval (opt e) == eval e
+          eval x * eval y == eval (EMul x y),    
+      QC.testProperty "opt without Mul" $
+        \(e :: Exp) -> not $ hasEMul (opt e),
+      QC.testProperty "eval in opt" $
+        \(e :: Exp) -> eval(e) == eval (opt(e))
     ]
 
 parserProps :: TestTree
@@ -80,10 +82,25 @@ opUnitTests :: TestTree
 opUnitTests =
   testGroup
   "opt"
-  [testCase "Mul to Add" $
-     opt (EMul (ENat 3) (ENat 2)) @?= EAdd (ENat 3) (EAdd (ENat 3) (ENat 0)),
-   testCase "Zero" $
-     opt (EMul (ENat 10) (ENat 0)) @?= ENat 0,
-   testCase "Random Add on opt"$
-     opt (EAdd (ENat 4) (EAdd (ENat 0) (ENat 0))) @?= EAdd (ENat 4) (EAdd (ENat 0) (ENat 0))
+  [
+   testCase "ENat" $
+    eval (opt (unsafeParse "2")) @?= eval(unsafeParse "2"),
+   testCase "EAdd" $
+    eval (opt (unsafeParse "2+3")) @?= eval(unsafeParse "2+3"),
+   testCase "Simple Mul" $
+    eval (opt (unsafeParse "2*3")) @?= eval(unsafeParse "2*3"),
+   testCase "Addition test 0" $
+    eval (opt (unsafeParse "3*2+4")) @?= eval(unsafeParse "3*2+4"),
+   testCase "Addition test 1"$
+    eval (opt (unsafeParse "1+2*6")) @?= eval(unsafeParse "1+2*6"),
+   testCase "Addition test 2"$
+    eval (opt (unsafeParse "1+2+6")) @?= eval(unsafeParse "1+2+6"),
+   testCase "Addition test 3"$
+    eval (opt (unsafeParse "(2*3)+(3*4)")) @?= eval(unsafeParse "(2*3)+(3*4)"),
+   testCase "Addition test 4"$
+    eval (opt (unsafeParse "2*3+3*4")) @?= eval(unsafeParse "2*3+3*4"),
+   testCase "Addition test 5"$
+    eval (opt (unsafeParse "1*0*0")) @?= eval(unsafeParse "1*0*0"),
+   testCase "Addition test 6"$
+    eval (opt (unsafeParse "(6*13)*(2*9)")) @?= eval(unsafeParse "(6*13)*(2*9)")
   ]
