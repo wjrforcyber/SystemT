@@ -38,7 +38,9 @@ evalProps =
           eval x + eval y == eval (EAdd x y),
       QC.testProperty "eval of Mul is *" $
         \(x :: Exp) (y :: Exp) ->
-          eval x * eval y == eval (EMul x y)
+          eval x * eval y == eval (EMul x y),
+      QC.testProperty "eval of opt" $
+        \(e :: Exp) -> eval (opt e) == eval e
     ]
 
 parserProps :: TestTree
@@ -50,7 +52,7 @@ parserProps =
     ]
 
 unitTests :: TestTree
-unitTests = testGroup "Unit tests" [evalUnitTests, parserUnitTests]
+unitTests = testGroup "Unit tests" [evalUnitTests, parserUnitTests, opUnitTests]
 
 evalUnitTests :: TestTree
 evalUnitTests =
@@ -73,3 +75,15 @@ parserUnitTests =
     [ testCase "2 + 3 * 4" $
         parse "2 + 3 * 4" @?= Right (EAdd (ENat 2) (EMul (ENat 3) (ENat 4)))
     ]
+
+opUnitTests :: TestTree
+opUnitTests =
+  testGroup
+  "opt"
+  [testCase "Mul to Add" $
+     opt (EMul (ENat 3) (ENat 2)) @?= EAdd (ENat 3) (EAdd (ENat 3) (ENat 0)),
+   testCase "Zero" $
+     opt (EMul (ENat 10) (ENat 0)) @?= ENat 0,
+   testCase "Random Add on opt"$
+     opt (EAdd (ENat 4) (EAdd (ENat 0) (ENat 0))) @?= EAdd (ENat 4) (EAdd (ENat 0) (ENat 0))
+  ]
