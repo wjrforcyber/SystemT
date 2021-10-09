@@ -7,5 +7,5 @@ jobs:
     name: Check if all files end in newline
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/linelint@master
+      - uses: fernandrone/linelint@master
         id: linelint
