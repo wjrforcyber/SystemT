@@ -48,7 +48,7 @@ parseExp :: Parser Exp
 parseExp = buildExpressionParser table parseAtom <?> "expression"
   where
     table =
-      [ [binary "*" EMul AssocLeft],
+      [ [binary "*" EMul AssocRight],
         [binary "+" EAdd AssocRight]
       ]
     binary name fun assoc = Infix (reservedOp name >> return fun) assoc
