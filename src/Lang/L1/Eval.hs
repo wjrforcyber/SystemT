@@ -36,4 +36,4 @@ optMul (Succ n) e2 = EAdd e2 (optMul n e2)
 opt2 :: Exp -> Exp
 opt2 e@(ENat _) = e
 opt2 (EAdd e1 e2) = EAdd (opt2 e1) (opt2 e2)
-opt2 (EMul e1 e2) = optMul (eval e1) (opt e2)
+opt2 (EMul e1 e2) = optMul (eval e1) (opt2 e2)
