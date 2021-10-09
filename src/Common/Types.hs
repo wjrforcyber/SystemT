@@ -38,7 +38,7 @@ instance Num Nat where
   negate = id
 
 instance Arbitrary Nat where
-  arbitrary = fromNatural <$> arbitrarySizedNatural
+  arbitrary = fromNatural <$> arbitrarySizedNatural `suchThat` \n -> n < 20
   shrink = fmap fromNatural . shrinkIntegral . toNatural
 
 instance Pretty Nat where

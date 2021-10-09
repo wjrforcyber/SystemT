@@ -4,6 +4,7 @@ name: ci
 jobs:
   build:
     runs-on: ubuntu-latest
+    name: Build and test Haskell project
     strategy:
       matrix:
         cabal: ["latest"]

@@ -48,8 +48,8 @@ parseExp :: Parser Exp
 parseExp = buildExpressionParser table parseAtom <?> "expression"
   where
     table =
-      [ [binary "*" EMul AssocLeft],
-        [binary "+" EAdd AssocLeft]
+      [ [binary "*" EMul AssocRight],
+        [binary "+" EAdd AssocRight]
       ]
     binary name fun assoc = Infix (reservedOp name >> return fun) assoc
 
@@ -67,11 +67,25 @@ prettyExp (ENat n)     = PP.pretty n
 prettyExp (EAdd e1 e2) = PP.parens (prettyExp e1 <+> PP.pretty "+" <+> prettyExp e2)
 prettyExp (EMul e1 e2) = PP.parens (prettyExp e1 <+> PP.pretty "*" <+> prettyExp e2)
 
+
+unsafeParse :: String -> Exp
+unsafeParse s =
+  case parse parseExp "" s of
+    Left _ -> error "invalid expression"
+    Right exp -> exp
+
+
+hasEMul :: Exp -> Bool
+hasEMul (ENat _) = False
+hasEMul (EAdd e1 e2) = hasEMul e1 || hasEMul e2
+hasEMul (EMul _ _) = True
+
+
 instance Arbitrary Exp where
   arbitrary = sized arbExp
 
 arbExp :: Int -> Gen Exp
-arbExp 0 = ENat <$> arbitrary `suchThat` \n -> n < 30
+arbExp 0 = ENat <$> arbitrary
 arbExp n = do
   (Positive m) <- arbitrary
   let subExp = arbExp (n `div` (m + 1))
