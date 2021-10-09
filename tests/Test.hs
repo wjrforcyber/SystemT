@@ -39,10 +39,14 @@ evalProps =
       QC.testProperty "eval of Mul is *" $
         \(x :: Exp) (y :: Exp) ->
           eval x * eval y == eval (EMul x y),    
-      QC.testProperty "opt without Mul" $
+      QC.testProperty "opt has no Muls" $
         \(e :: Exp) -> not $ hasEMul (opt e),
-      QC.testProperty "eval in opt" $
-        \(e :: Exp) -> eval(e) == eval (opt(e))
+      QC.testProperty "opt doesn't change eval" $
+        \(e :: Exp) -> eval(e) == eval (opt(e)),
+      QC.testProperty "opt2 has no Muls" $
+        \(e :: Exp) -> not $ hasEMul (opt2 e),
+      QC.testProperty "opt2 doesn't change eval" $
+        \(e :: Exp) -> eval(e) == eval (opt2(e))
     ]
 
 parserProps :: TestTree
