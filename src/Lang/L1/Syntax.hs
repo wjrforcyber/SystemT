@@ -85,7 +85,7 @@ instance Arbitrary Exp where
   arbitrary = sized arbExp
 
 arbExp :: Int -> Gen Exp
-arbExp 0 = ENat <$> arbitrary `suchThat` \n -> n < 30
+arbExp 0 = ENat <$> arbitrary
 arbExp n = do
   (Positive m) <- arbitrary
   let subExp = arbExp (n `div` (m + 1))
