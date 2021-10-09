@@ -110,11 +110,10 @@ opUnitTests =
     eval (opt (unsafeParse "(6*13)*(2*9)")) @?= eval(unsafeParse "(6*13)*(2*9)"),
    testCase "Addition test 7"$
     opt (unsafeParse "2+3*4") @?= unsafeParse "2+3+3+3+3+0",
-   testCase "Addition test 8"$
-    opt (unsafeParse "2+3*4") @?= unsafeParse "2+4+4+4+0",
-   testCase "Addition test 9"$
-    opt2 (unsafeParse "2+3*4") @?= unsafeParse "2+3+3+3+3+0",
+  --  testCase "Addition test 8"$
+  --   opt (unsafeParse "2+3*4") @?= unsafeParse "2+4+4+4+0",
+  --  testCase "Addition test 9"$
+  --   opt2 (unsafeParse "2+3*4") @?= unsafeParse "2+3+3+3+3+0",
    testCase "Addition test 10"$
     opt2 (unsafeParse "2+3*4") @?= unsafeParse "2+4+4+4+0"
   ]
-  
