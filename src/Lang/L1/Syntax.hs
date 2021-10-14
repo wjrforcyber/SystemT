@@ -13,8 +13,10 @@ import Test.QuickCheck
 
 data Exp
   = ENat Nat
+  | EBool Bool
   | EAdd Exp Exp
   | EMul Exp Exp
+  | EIf Exp Exp Exp
   deriving (Eq, Show)
 
 -- Parser for Exp
@@ -85,7 +87,7 @@ instance Arbitrary Exp where
   arbitrary = sized arbExp
 
 arbExp :: Int -> Gen Exp
-arbExp 0 = ENat <$> arbitrary
+arbExp 0 = ENat <$> arbitrary `suchThat` \n -> n < 30
 arbExp n = do
   (Positive m) <- arbitrary
   let subExp = arbExp (n `div` (m + 1))

@@ -113,5 +113,7 @@ opUnitTests =
       --  testCase "Addition test 9"$
       --   opt2 (unsafeParse "2+3*4") @?= unsafeParse "2+3+3+3+3+0",
       testCase "Addition test 10" $
-        opt2 (unsafeParse "2+3*4") @?= unsafeParse "2+4+4+4+0"
+        opt2 (unsafeParse "2+3*4") @?= unsafeParse "2+4+4+4+0",
+      testCase "Infer 0" $
+        infer (unsafeParse "2+3*4") @?= Just Nat
     ]

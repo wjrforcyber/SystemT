@@ -7,6 +7,8 @@ import Prettyprinter
 
 data Nat = Zero | Succ Nat deriving (Eq, Ord)
 
+data Ty = Nat | Bool deriving (Eq, Ord)
+
 toNatural :: Nat -> Natural
 toNatural Zero = 0
 toNatural (Succ n) = succ (toNatural n)
@@ -40,6 +42,7 @@ instance Num Nat where
 instance Arbitrary Nat where
   arbitrary = fromNatural <$> arbitrarySizedNatural `suchThat` \n -> n < 20
   shrink = fmap fromNatural . shrinkIntegral . toNatural
+
 
 instance Pretty Nat where
   pretty = pretty . toNatural
