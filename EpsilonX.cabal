@@ -47,6 +47,7 @@ test-suite test
     import:         common-deps
     type:           exitcode-stdio-1.0
     main-is:        Test.hs
+    other-modules:  L1tests,L2tests
     hs-source-dirs: tests
     ghc-options:    -threaded -with-rtsopts=-N
     build-depends:
