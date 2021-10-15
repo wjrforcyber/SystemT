@@ -7,8 +7,6 @@ import Prettyprinter
 
 data Nat = Zero | Succ Nat deriving (Eq, Ord)
 
-data Ty = Nat | Bool deriving (Eq, Ord)
-
 toNatural :: Nat -> Natural
 toNatural Zero = 0
 toNatural (Succ n) = succ (toNatural n)

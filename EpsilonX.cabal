@@ -31,6 +31,8 @@ library
         Common.Types
         Lang.L1.Syntax
         Lang.L1.Eval
+        Lang.L2.Syntax
+        Lang.L2.Typecheck
     other-modules:
         Experiments.Tests
     hs-source-dirs:   src

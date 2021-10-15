@@ -13,7 +13,6 @@ import Test.QuickCheck
 
 data Exp
   = ENat Nat
-  | EBool Bool
   | EAdd Exp Exp
   | EMul Exp Exp
   | EIf Exp Exp Exp
