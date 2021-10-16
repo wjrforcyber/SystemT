@@ -17,16 +17,16 @@ l2Props =
     "eval"
     [ QC.testProperty "check test EAdd" $
         \(e1 :: Exp) (e2 :: Exp) ->
-          check (EAdd e1 e2) TNat == check e1 TNat && check e2 TNat,
+          check (EAdd e1 e2) TNat == (check e1 TNat && check e2 TNat),
       QC.testProperty "check test EMul" $
         \(e1 :: Exp) (e2 :: Exp) ->
-          check (EMul e1 e2) TNat == check e1 TNat && check e2 TNat,
+          check (EMul e1 e2) TNat == (check e1 TNat && check e2 TNat),
       QC.testProperty "check test EIf 0" $
         \(e1 :: Exp) (e2 :: Exp) (e3 :: Exp) ->
-          check (EIf e1 e2 e3) TNat == check e1 TBool && (check e2 TNat || check e3 TNat),
+          check (EIf e1 e2 e3) TNat == (check e1 TBool && (check e2 TNat || check e3 TNat)),
       QC.testProperty "check test EIf 1" $
         \(e1 :: Exp) (e2 :: Exp) (e3 :: Exp)->
-          check (EIf e1 e2 e3) TBool == check e1 TBool && (check e2 TBool || check e3 TBool)
+          check (EIf e1 e2 e3) TBool == (check e1 TBool && (check e2 TBool || check e3 TBool))
     ]
 
 unitTests :: TestTree
