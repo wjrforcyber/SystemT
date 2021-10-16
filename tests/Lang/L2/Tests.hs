@@ -1,5 +1,5 @@
 {-# LANGUAGE ScopedTypeVariables #-}
-module Lang.L2.Tests where
+module Lang.L2.Tests (unitTests, propertyTests) where
 
 import Lang.L2.Typecheck
 import Lang.L2.Syntax
@@ -8,6 +8,8 @@ import Test.Tasty
 import Test.Tasty.HUnit
 import Test.Tasty.QuickCheck as QC
 
+propertyTests :: TestTree
+propertyTests = testGroup "L2 Property tests" [l2Props]
 
 l2Props :: TestTree
 l2Props =
@@ -27,6 +29,8 @@ l2Props =
           check (EIf e1 e2 e3) Bool == check e1 Bool && (check e2 Bool || check e3 Bool)
     ]
 
+unitTests :: TestTree
+unitTests = testGroup "L2 Property tests" [unitL2Tests]
 
 unitL2Tests :: TestTree
 unitL2Tests =

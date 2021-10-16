@@ -14,18 +14,10 @@ common common-deps
     mtl >= 2.2,
     parsec >= 3.1.14.0,
     prettyprinter >= 1.7.1,
-    QuickCheck >= 2.14.2,
-    tasty >= 1.4.2,
-    tasty-hunit >= 0.10.0.3,
-    tasty-quickcheck >= 0.10.1.2
-
-    -- liquid-base,
-    -- liquidhaskell
-
+    QuickCheck >= 2.14.2
   ghc-options:
     -Wall
     -Wextra
-    -- -fplugin=LiquidHaskell
   other-modules:
     Paths_EpsilonX
 
@@ -37,8 +29,6 @@ library
         Lang.L1.Eval
         Lang.L2.Syntax
         Lang.L2.Typecheck
-        Lang.L1.Tests
-        Lang.L2.Tests
     other-modules:
         Experiments.Tests
     hs-source-dirs:   src
@@ -53,11 +43,13 @@ test-suite test
     import:         common-deps
     type:           exitcode-stdio-1.0
     main-is:        Test.hs
-    -- other-modules:  L1tests,L2tests
+    other-modules:
+        Lang.L1.Tests
+        Lang.L2.Tests
     hs-source-dirs: tests
     ghc-options:    -threaded -with-rtsopts=-N
     build-depends:
         EpsilonX,
-        -- tasty >= 1.4.2,
-        -- tasty-hunit >= 0.10.0.3,
-        -- tasty-quickcheck >= 0.10.1.2
+        tasty >= 1.4.2,
+        tasty-hunit >= 0.10.0.3,
+        tasty-quickcheck >= 0.10.1.2

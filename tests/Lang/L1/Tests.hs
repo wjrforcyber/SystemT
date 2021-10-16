@@ -1,5 +1,5 @@
 {-# LANGUAGE ScopedTypeVariables #-}
-module Lang.L1.Tests where
+module Lang.L1.Tests (unitTests, propertyTests) where
 
 import Common.Types
 import Lang.L1.Eval
@@ -16,6 +16,9 @@ parse = P.parse parseExp ""
 
 pp :: Exp -> String
 pp = show . PP.pretty
+
+propertyTests :: TestTree
+propertyTests = testGroup "L1 Property tests" [evalUnitTests, parserUnitTests, opUnitL1Tests]
 
 evalProps :: TestTree
 evalProps =
@@ -48,7 +51,7 @@ parserProps =
     ]
 
 unitTests :: TestTree
-unitTests = testGroup "Unit tests" [evalUnitTests, parserUnitTests, opUnitL1Tests]
+unitTests = testGroup "L1 Unit tests" [evalUnitTests, parserUnitTests, opUnitL1Tests]
 
 evalUnitTests :: TestTree
 evalUnitTests =

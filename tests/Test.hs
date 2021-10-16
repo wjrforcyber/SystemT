@@ -1,18 +1,19 @@
-{-# LANGUAGE ScopedTypeVariables #-}
-
 -- | This is a test suite.
 module Main where
 
 import Test.Tasty
 
-import Lang.L1.Tests
-import Lang.L2.Tests
+import qualified Lang.L1.Tests as L1
+import qualified Lang.L2.Tests as L2
 
 main :: IO ()
 main = defaultMain tests
 
 tests :: TestTree
-tests = testGroup "Tests" [propertyTests, unitTests, l2Props, unitL2Tests]
+tests = testGroup "Tests" [unitTests, propertyTests]
+
+unitTests :: TestTree
+unitTests = testGroup "Unit tests" [L1.unitTests, L2.unitTests]
 
 propertyTests :: TestTree
-propertyTests = testGroup "Property tests" [evalProps, parserProps]
+propertyTests = testGroup "Property tests" [L1.propertyTests, L2.propertyTests]
