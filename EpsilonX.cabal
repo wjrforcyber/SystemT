@@ -18,6 +18,7 @@ common common-deps
   ghc-options:
     -Wall
     -Wextra
+    -Werror
   other-modules:
     Paths_EpsilonX
 
