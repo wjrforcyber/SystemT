@@ -17,16 +17,16 @@ l2Props =
     "eval"
     [ QC.testProperty "check test EAdd" $
         \(e1 :: Exp) (e2 :: Exp) ->
-          check (EAdd e1 e2) Nat == check e1 Nat && check e2 Nat,
+          check (EAdd e1 e2) TNat == check e1 TNat && check e2 TNat,
       QC.testProperty "check test EMul" $
         \(e1 :: Exp) (e2 :: Exp) ->
-          check (EMul e1 e2) Nat == check e1 Nat && check e2 Nat,
+          check (EMul e1 e2) TNat == check e1 TNat && check e2 TNat,
       QC.testProperty "check test EIf 0" $
         \(e1 :: Exp) (e2 :: Exp) (e3 :: Exp) ->
-          check (EIf e1 e2 e3) Nat == check e1 Bool && (check e2 Nat || check e3 Nat),
+          check (EIf e1 e2 e3) TNat == check e1 TBool && (check e2 TNat || check e3 TNat),
       QC.testProperty "check test EIf 1" $
         \(e1 :: Exp) (e2 :: Exp) (e3 :: Exp)->
-          check (EIf e1 e2 e3) Bool == check e1 Bool && (check e2 Bool || check e3 Bool)
+          check (EIf e1 e2 e3) TBool == check e1 TBool && (check e2 TBool || check e3 TBool)
     ]
 
 unitTests :: TestTree
@@ -38,31 +38,31 @@ unitL2Tests =
     "L2"
     [
       testCase "Unit on L2 0" $
-        check (EIf (EBool True) (ENat 1) (ENat 3)) Nat @?= True,
+        check (EIf (EBool True) (ENat 1) (ENat 3)) TNat @?= True,
       testCase "Unit on L2 1" $
-        check (EIf (EBool False) (ENat 2) (EAdd (ENat 1) (ENat 3))) Nat @?= True,
+        check (EIf (EBool False) (ENat 2) (EAdd (ENat 1) (ENat 3))) TNat @?= True,
       testCase "Unit on L2 2" $
-        check (EIf (EBool ((False && False) || (True))) (EBool True) (EBool False)) Bool @?= True,
+        check (EIf (EBool ((False && False) || (True))) (EBool True) (EBool False)) TBool @?= True,
       testCase "Unit on L2 3" $
-        check (EAdd (ENat 1) (ENat 2)) Nat @?= True,
+        check (EAdd (ENat 1) (ENat 2)) TNat @?= True,
       testCase "Unit on L2 4" $
-        check (EAdd (EAdd (ENat 1) (ENat 2)) (EAdd (ENat 3) (ENat 4))) Nat @?= True,
+        check (EAdd (EAdd (ENat 1) (ENat 2)) (EAdd (ENat 3) (ENat 4))) TNat @?= True,
       testCase "Unit on L2 5" $
-        check (EAdd (ENat 1) (ENat 2)) Nat @?= True,
+        check (EAdd (ENat 1) (ENat 2)) TNat @?= True,
       testCase "Unit on L2 6" $
-        check (ENat 1) Bool @?= False,
+        check (ENat 1) TBool @?= False,
       testCase "Unit on L2 7" $
-        check (EIf (ENat 3) (ENat 1) (ENat 2)) Nat @?= False,
+        check (EIf (ENat 3) (ENat 1) (ENat 2)) TNat @?= False,
       testCase "Unit on L2 infer 0" $
-        infer (ENat 1) @?= Just Nat,
+        infer (ENat 1) @?= Just TNat,
       testCase "Unit on L2 infer 1" $
-        infer (EBool True) @?= Just Bool,
+        infer (EBool True) @?= Just TBool,
       testCase "Unit on L2 infer 2" $
-        infer (EAdd (ENat 1) (ENat 2)) @?= Just Nat,
+        infer (EAdd (ENat 1) (ENat 2)) @?= Just TNat,
       testCase "Unit on L2 infer 3" $
-        infer (EBool (True && False)) @?= Just Bool,
+        infer (EBool (True && False)) @?= Just TBool,
       testCase "Unit on L2 infer 4" $
-        infer (EIf (EBool True) (EAdd (ENat 1) (ENat 2)) (EMul (ENat 3)(ENat 4))) @?= Just Nat,
+        infer (EIf (EBool True) (EAdd (ENat 1) (ENat 2)) (EMul (ENat 3)(ENat 4))) @?= Just TNat,
       testCase "Unit on L2 infer 5" $
-        infer (EIf (EIf (EBool True) (EBool True) (EBool True)) (EAdd (ENat 1) (ENat 2)) (EMul (ENat 3)(ENat 4))) @?= Just Nat
+        infer (EIf (EIf (EBool True) (EBool True) (EBool True)) (EAdd (ENat 1) (ENat 2)) (EMul (ENat 3)(ENat 4))) @?= Just TNat
     ]

@@ -5,7 +5,7 @@ import Common.Types
 import Test.QuickCheck
 
 
-data Ty = Nat | Bool deriving (Eq, Show)
+data Ty = TNat | TBool deriving (Eq, Show)
 
 data Exp
   = ENat Nat

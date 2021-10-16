@@ -5,26 +5,26 @@ import Lang.L2.Syntax
 --checker
 check :: Exp->Ty->Bool
 
-check (ENat _) Nat = True
-check (EBool _) Bool = True
+check (ENat _) TNat = True
+check (EBool _) TBool = True
 
-check (EAdd e1 e2) Nat = check e1 Nat && check e2 Nat
-check (EMul e1 e2) Nat = check e1 Nat && check e2 Nat
+check (EAdd e1 e2) TNat = check e1 TNat && check e2 TNat
+check (EMul e1 e2) TNat = check e1 TNat && check e2 TNat
 
-check (EIf e1 e2 e3) Nat = check e1 Bool && (check e2 Nat || check e3 Nat)
-check (EIf e1 e2 e3) Bool = check e1 Bool && (check e2 Bool || check e3 Bool)
+check (EIf e1 e2 e3) TNat = check e1 TBool && (check e2 TNat || check e3 TNat)
+check (EIf e1 e2 e3) TBool = check e1 TBool && (check e2 TBool || check e3 TBool)
 
 check _ _ = False
 
 
 --infer
 infer :: Exp->Maybe Ty
-infer (ENat _) = Just Nat
-infer (EBool _) = Just Bool
-infer (EAdd e1 e2) = Just Nat
-infer (EMul e1 e2) = Just Nat
+infer (ENat _) = Just TNat
+infer (EBool _) = Just TBool
+infer (EAdd e1 e2) = Just TNat
+infer (EMul e1 e2) = Just TNat
 
 infer (EIf (EBool True) e2 e3) = infer e2
 infer (EIf (EBool False) e2 e3) = infer e3
-infer (EIf e1 e2 e3)  = infer (EIf (EBool (check e1 Bool)) e2 e3)
+infer (EIf e1 e2 e3)  = infer (EIf (EBool (check e1 TBool)) e2 e3)
 infer _ = Nothing
