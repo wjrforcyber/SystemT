@@ -4,8 +4,9 @@ module Lang.L2.Syntax where
 import Common.Types
 import Test.QuickCheck
 
-
-data Ty = TNat | TBool deriving (Eq, Show)
+data Ty = TNat
+        | TBool
+        deriving (Eq, Show)
 
 data Exp
   = ENat Nat
@@ -14,6 +15,9 @@ data Exp
   | EMul Exp Exp
   | EIf Exp Exp Exp
   deriving (Eq, Show)
+
+instance Arbitrary Ty where
+  arbitrary = oneof [ pure TNat, pure TBool ]
 
 instance Arbitrary Exp where
   arbitrary = sized arbExp

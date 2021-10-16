@@ -1,9 +1,9 @@
 {-# LANGUAGE ScopedTypeVariables #-}
+
 module Lang.L2.Tests (unitTests, propertyTests) where
 
-import Lang.L2.Typecheck
 import Lang.L2.Syntax
-
+import Lang.L2.Typecheck
 import Test.Tasty
 import Test.Tasty.HUnit
 import Test.Tasty.QuickCheck as QC
@@ -25,8 +25,16 @@ l2Props =
         \(e1 :: Exp) (e2 :: Exp) (e3 :: Exp) ->
           check (EIf e1 e2 e3) TNat == (check e1 TBool && (check e2 TNat || check e3 TNat)),
       QC.testProperty "check test EIf 1" $
-        \(e1 :: Exp) (e2 :: Exp) (e3 :: Exp)->
-          check (EIf e1 e2 e3) TBool == (check e1 TBool && (check e2 TBool || check e3 TBool))
+        \(e1 :: Exp) (e2 :: Exp) (e3 :: Exp) ->
+          check (EIf e1 e2 e3) TBool == (check e1 TBool && (check e2 TBool || check e3 TBool)),
+      QC.testProperty "inferred type should be checked true" $
+        \(e :: Exp) ->
+          case infer e of
+            Just ty -> check e ty
+            Nothing -> True,
+      QC.testProperty "checked type should be same as inferred type" $
+        \(e :: Exp) (ty :: Ty) ->
+          not (check e ty) || (infer e == Just ty)
     ]
 
 unitTests :: TestTree
@@ -36,8 +44,7 @@ unitL2Tests :: TestTree
 unitL2Tests =
   testGroup
     "L2"
-    [
-      testCase "Unit on L2 0" $
+    [ testCase "Unit on L2 0" $
         check (EIf (EBool True) (ENat 1) (ENat 3)) TNat @?= True,
       testCase "Unit on L2 1" $
         check (EIf (EBool False) (ENat 2) (EAdd (ENat 1) (ENat 3))) TNat @?= True,
@@ -62,7 +69,7 @@ unitL2Tests =
       testCase "Unit on L2 infer 3" $
         infer (EBool (True && False)) @?= Just TBool,
       testCase "Unit on L2 infer 4" $
-        infer (EIf (EBool True) (EAdd (ENat 1) (ENat 2)) (EMul (ENat 3)(ENat 4))) @?= Just TNat,
+        infer (EIf (EBool True) (EAdd (ENat 1) (ENat 2)) (EMul (ENat 3) (ENat 4))) @?= Just TNat,
       testCase "Unit on L2 infer 5" $
-        infer (EIf (EIf (EBool True) (EBool True) (EBool True)) (EAdd (ENat 1) (ENat 2)) (EMul (ENat 3)(ENat 4))) @?= Just TNat
+        infer (EIf (EIf (EBool True) (EBool True) (EBool True)) (EAdd (ENat 1) (ENat 2)) (EMul (ENat 3) (ENat 4))) @?= Just TNat
     ]
