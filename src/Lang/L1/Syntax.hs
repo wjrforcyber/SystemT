@@ -15,7 +15,6 @@ data Exp
   = ENat Nat
   | EAdd Exp Exp
   | EMul Exp Exp
-  | EIf Exp Exp Exp
   deriving (Eq, Show)
 
 -- Parser for Exp

@@ -27,6 +27,17 @@ opUnitL2Tests =
       testCase "Unit on L2 6" $
         check (ENat 1) Bool @?= False,
       testCase "Unit on L2 7" $
-        check (EIf (ENat 3) (ENat 1) (ENat 2)) Nat @?= False
-
+        check (EIf (ENat 3) (ENat 1) (ENat 2)) Nat @?= False,
+      testCase "Unit on L2 infer 0" $
+        infer (ENat 1) @?= Just Nat,
+      testCase "Unit on L2 infer 1" $
+        infer (EBool True) @?= Just Bool,
+      testCase "Unit on L2 infer 2" $
+        infer (EAdd (ENat 1) (ENat 2)) @?= Just Nat,
+      testCase "Unit on L2 infer 3" $
+        infer (EBool (True && True && False)) @?= Just Bool,
+      testCase "Unit on L2 infer 4" $
+        infer (EIf (EBool True) (EAdd (ENat 1) (ENat 2)) (EMul (ENat 3)(ENat 4))) @?= Just Nat,
+      testCase "Unit on L2 infer 5" $
+        infer (EIf (EIf (EBool True) (EBool True) (EBool True)) (EAdd (ENat 1) (ENat 2)) (EMul (ENat 3)(ENat 4))) @?= Just Nat
     ]

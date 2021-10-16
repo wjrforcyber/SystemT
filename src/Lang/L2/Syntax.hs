@@ -2,9 +2,10 @@
 module Lang.L2.Syntax where
 
 import Common.Types
+import Test.QuickCheck
 
 
-data Ty = Nat | Bool deriving (Eq, Ord)
+data Ty = Nat | Bool deriving (Eq, Show)
 
 data Exp
   = ENat Nat
