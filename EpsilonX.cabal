@@ -30,7 +30,6 @@ library
         Lang.L2.Syntax
         Lang.L2.Typecheck
     other-modules:
-        Experiments.Tests
     hs-source-dirs:   src
 
 executable main
