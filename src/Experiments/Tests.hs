@@ -1,6 +1,8 @@
 -- | This is an old experiment.
 module Experiments.Tests where
 
+{-# ANN module "HLint: ignore" #-}
+
 data Nat = Zero | Succ Nat deriving (Eq, Show)
 
 -- Expression
