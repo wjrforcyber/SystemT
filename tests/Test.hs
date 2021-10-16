@@ -3,20 +3,16 @@
 -- | This is a test suite.
 module Main where
 
-import Common.Types
 import Test.Tasty
-import Test.Tasty.HUnit
-import Test.Tasty.QuickCheck as QC
 
-
-import L1tests
-import L2tests
+import Lang.L1.Tests
+import Lang.L2.Tests
 
 main :: IO ()
 main = defaultMain tests
 
 tests :: TestTree
-tests = testGroup "Tests" [propertyTests, unitTests, opUnitL2Tests]
+tests = testGroup "Tests" [propertyTests, unitTests, l2Props, unitL2Tests]
 
 propertyTests :: TestTree
 propertyTests = testGroup "Property tests" [evalProps, parserProps]

@@ -1,5 +1,5 @@
 {-# LANGUAGE ScopedTypeVariables #-}
-module L1tests where
+module Lang.L1.Tests where
 
 import Common.Types
 import Lang.L1.Eval

@@ -51,7 +51,7 @@ parseExp = buildExpressionParser table parseAtom <?> "expression"
       [ [binary "*" EMul AssocRight],
         [binary "+" EAdd AssocRight]
       ]
-    binary name fun assoc = Infix (reservedOp name >> return fun) assoc
+    binary name fun = Infix (reservedOp name >> return fun)
 
 parseLang :: Parser Exp
 parseLang = whiteSpace *> parseExp <* eof

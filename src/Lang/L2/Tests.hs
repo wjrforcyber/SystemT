@@ -1,14 +1,35 @@
-module L2tests where
+{-# LANGUAGE ScopedTypeVariables #-}
+module Lang.L2.Tests where
 
 import Lang.L2.Typecheck
 import Lang.L2.Syntax
 
 import Test.Tasty
 import Test.Tasty.HUnit
+import Test.Tasty.QuickCheck as QC
 
 
-opUnitL2Tests :: TestTree
-opUnitL2Tests =
+l2Props :: TestTree
+l2Props =
+  testGroup
+    "eval"
+    [ QC.testProperty "check test EAdd" $
+        \(e1 :: Exp) (e2 :: Exp) ->
+          check (EAdd e1 e2) Nat == check e1 Nat && check e2 Nat,
+      QC.testProperty "check test EMul" $
+        \(e1 :: Exp) (e2 :: Exp) ->
+          check (EMul e1 e2) Nat == check e1 Nat && check e2 Nat,
+      QC.testProperty "check test EIf 0" $
+        \(e1 :: Exp) (e2 :: Exp) (e3 :: Exp) ->
+          check (EIf e1 e2 e3) Nat == check e1 Bool && (check e2 Nat || check e3 Nat),
+      QC.testProperty "check test EIf 1" $
+        \(e1 :: Exp) (e2 :: Exp) (e3 :: Exp)->
+          check (EIf e1 e2 e3) Bool == check e1 Bool && (check e2 Bool || check e3 Bool)
+    ]
+
+
+unitL2Tests :: TestTree
+unitL2Tests =
   testGroup
     "L2"
     [
@@ -17,7 +38,7 @@ opUnitL2Tests =
       testCase "Unit on L2 1" $
         check (EIf (EBool False) (ENat 2) (EAdd (ENat 1) (ENat 3))) Nat @?= True,
       testCase "Unit on L2 2" $
-        check (EIf (EBool (((False && False) || (True)))) (EBool True) (EBool False)) Bool @?= True,
+        check (EIf (EBool ((False && False) || (True))) (EBool True) (EBool False)) Bool @?= True,
       testCase "Unit on L2 3" $
         check (EAdd (ENat 1) (ENat 2)) Nat @?= True,
       testCase "Unit on L2 4" $
@@ -35,7 +56,7 @@ opUnitL2Tests =
       testCase "Unit on L2 infer 2" $
         infer (EAdd (ENat 1) (ENat 2)) @?= Just Nat,
       testCase "Unit on L2 infer 3" $
-        infer (EBool (True && True && False)) @?= Just Bool,
+        infer (EBool (True && False)) @?= Just Bool,
       testCase "Unit on L2 infer 4" $
         infer (EIf (EBool True) (EAdd (ENat 1) (ENat 2)) (EMul (ENat 3)(ENat 4))) @?= Just Nat,
       testCase "Unit on L2 infer 5" $
