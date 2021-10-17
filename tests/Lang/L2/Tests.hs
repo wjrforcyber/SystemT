@@ -65,5 +65,7 @@ unitL2Tests =
       testCase "Unit on L2 infer 4" $
         infer (EIf (EBool True) (EAdd (ENat 1) (ENat 2)) (EMul (ENat 3) (ENat 4))) @?= Just TNat,
       testCase "Unit on L2 infer 5" $
-        infer (EIf (EIf (EBool True) (EBool True) (EBool True)) (EAdd (ENat 1) (ENat 2)) (EMul (ENat 3) (ENat 4))) @?= Just TNat
+        infer (EIf (EIf (EBool True) (EBool True) (EBool True)) (EAdd (ENat 1) (ENat 2)) (EMul (ENat 3) (ENat 4))) @?= Just TNat,
+      testCase "Unit on L2 infer 6" $
+        infer (EIf(EIf (EBool True) (EBool False) (EBool True)) (ENat 5) (ENat 6)) @?= Just TNat
     ]
