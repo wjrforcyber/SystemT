@@ -72,7 +72,7 @@ unsafeParse :: String -> Exp
 unsafeParse s =
   case parse parseExp "" s of
     Left _ -> error "invalid expression"
-    Right exp -> exp
+    Right expre -> expre
 
 
 hasEMul :: Exp -> Bool

@@ -29,4 +29,4 @@ infer (EAdd e1 e2) = if (infer e1 == Just TNat) && (infer e2 == Just TNat) then 
 infer (EMul e1 e2) = if (infer e1 == Just TNat) && (infer e2 == Just TNat) then Just TNat else Nothing
 infer (EIf e1 e2 e3) = if check e1 TBool then if e1 == (EBool True) then infer e2 else infer e3 else Nothing
 
-infer _ = Nothing
+-- infer _ = Nothing

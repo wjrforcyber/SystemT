@@ -18,7 +18,7 @@ pp :: Exp -> String
 pp = show . PP.pretty
 
 propertyTests :: TestTree
-propertyTests = testGroup "L1 Property tests" [evalUnitTests, parserUnitTests, opUnitL1Tests]
+propertyTests = testGroup "L1 Property tests" [evalProps, parserProps]
 
 evalProps :: TestTree
 evalProps =
