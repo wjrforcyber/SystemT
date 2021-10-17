@@ -21,12 +21,6 @@ l2Props =
       QC.testProperty "check test EMul" $
         \(e1 :: Exp) (e2 :: Exp) ->
           check (EMul e1 e2) TNat == (check e1 TNat && check e2 TNat),
-      -- QC.testProperty "check test EIf 0" $
-      --   \(e1 :: Exp) (e2 :: Exp) (e3 :: Exp) ->
-      --     check (EIf e1 e2 e3) TNat == (check e1 TBool && (check e2 TNat || check e3 TNat)),
-      -- QC.testProperty "check test EIf 1" $
-      --   \(e1 :: Exp) (e2 :: Exp) (e3 :: Exp) ->
-      --     check (EIf e1 e2 e3) TBool == (check e1 TBool && (check e2 TBool || check e3 TBool)),
       QC.testProperty "inferred type should be checked true" $
         \(e :: Exp) ->
           case infer e of
