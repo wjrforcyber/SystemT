@@ -18,6 +18,7 @@ common common-deps
   ghc-options:
     -Wall
     -Wextra
+    -Werror
   other-modules:
     Paths_EpsilonX
 
@@ -27,8 +28,9 @@ library
         Common.Types
         Lang.L1.Syntax
         Lang.L1.Eval
+        Lang.L2.Syntax
+        Lang.L2.Typecheck
     other-modules:
-        Experiments.Tests
     hs-source-dirs:   src
 
 executable main
@@ -41,6 +43,9 @@ test-suite test
     import:         common-deps
     type:           exitcode-stdio-1.0
     main-is:        Test.hs
+    other-modules:
+        Lang.L1.Tests
+        Lang.L2.Tests
     hs-source-dirs: tests
     ghc-options:    -threaded -with-rtsopts=-N
     build-depends:

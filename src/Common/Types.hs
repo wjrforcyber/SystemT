@@ -41,5 +41,6 @@ instance Arbitrary Nat where
   arbitrary = fromNatural <$> arbitrarySizedNatural `suchThat` \n -> n < 20
   shrink = fmap fromNatural . shrinkIntegral . toNatural
 
+
 instance Pretty Nat where
   pretty = pretty . toNatural
