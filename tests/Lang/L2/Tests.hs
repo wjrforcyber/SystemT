@@ -14,7 +14,7 @@ propertyTests = testGroup "L2 Property tests" [l2Props]
 l2Props :: TestTree
 l2Props =
   testGroup
-    "eval"
+    "L2"
     [ QC.testProperty "check test EAdd" $
         \(e1 :: Exp) (e2 :: Exp) ->
           check (EAdd e1 e2) TNat == (check e1 TNat && check e2 TNat),
@@ -32,7 +32,7 @@ l2Props =
     ]
 
 unitTests :: TestTree
-unitTests = testGroup "L2 Property tests" [unitL2Tests]
+unitTests = testGroup "L2 Unit tests" [unitL2Tests]
 
 unitL2Tests :: TestTree
 unitL2Tests =
