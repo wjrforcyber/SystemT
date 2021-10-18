@@ -20,6 +20,7 @@ data Exp
 data Val
   = VNat Nat
   | VBool Bool
+  deriving (Eq, Show)
 
 instance Arbitrary Ty where
   arbitrary = oneof [pure TNat, pure TBool]
