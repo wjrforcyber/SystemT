@@ -65,7 +65,7 @@ unitL2Tests =
       testCase "Unit on L2 1" $
         check (EIf (EBool False) (ENat 2) (EAdd (ENat 1) (ENat 3))) TNat @?= True,
       testCase "Unit on L2 2" $
-        check (EIf (EBool ((False) || True)) (EBool True) (EBool False)) TBool @?= True,
+        check (EIf (EBool True) (EBool True) (EBool False)) TBool @?= True,
       testCase "Unit on L2 3" $
         check (EAdd (ENat 1) (ENat 2)) TNat @?= True,
       testCase "Unit on L2 4" $
