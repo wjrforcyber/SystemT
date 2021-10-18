@@ -4,12 +4,32 @@ module Lang.L2.Tests (unitTests, propertyTests) where
 
 import Lang.L2.Syntax
 import Lang.L2.Typecheck
+import Lang.L2.Eval
 import Test.Tasty
 import Test.Tasty.HUnit
 import Test.Tasty.QuickCheck as QC
 
 propertyTests :: TestTree
-propertyTests = testGroup "L2 Property tests" [l2Props]
+propertyTests = testGroup "L2 Property tests" [evalL2Props, l2Props]
+
+
+evalL2Props :: TestTree
+evalL2Props =
+  testGroup
+    "eval"
+    [ QC.testProperty "eval of Nat is itself" $
+        \(x :: Exp) -> eval (ENat x) == x,
+      QC.testProperty "eval of Add is +" $
+        \(x :: Exp) (y :: Exp) ->
+          eval x + eval y == eval (EAdd x y),
+      QC.testProperty "eval of Mul is *" $
+        \(x :: Exp) (y :: Exp) ->
+          eval x * eval y == eval (EMul x y)
+    ]
+
+
+
+
 
 l2Props :: TestTree
 l2Props =
