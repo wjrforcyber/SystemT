@@ -26,7 +26,13 @@ evalL2Props =
           eval (EAdd (ENat x) (ENat y)) == Just (VNat (x+y)),
       QC.testProperty "eval of Mul is *" $
         \(x :: Nat) (y :: Nat) ->
-          eval (EMul (ENat x) (ENat y)) == Just (VNat (x*y))
+          eval (EMul (ENat x) (ENat y)) == Just (VNat (x*y)),
+      QC.testProperty "eval of EIf True is *" $
+        \(y :: Exp) (z::Exp) ->
+          eval (EIf (EBool True) (y) (z)) == eval(y),
+      QC.testProperty "eval of EIf False is *" $
+        \(y :: Exp) (z::Exp) ->
+          eval (EIf (EBool False) (y) (z)) == eval(z)
     ]
 
 
@@ -93,5 +99,5 @@ unitL2Tests =
       testCase "Unit on L2 eval 1" $
         eval(EAdd (EIf (EBool True) (ENat 1) (ENat 2)) (ENat 3)) @?= Just (VNat 4),
       testCase "Unit on L2 eval 2" $
-        eval(EIf (EIf (EBool True) (EBool False) (EAdd (ENat 1) (ENat 2))) (ENat 3) (EAdd (ENat 4) (ENat 5))) @?= Nothing
+        eval(EIf (EIf (EBool True) (EBool False) (EAdd (ENat 1) (ENat 2))) (ENat 3) (EAdd (ENat 4) (ENat 5))) @?= Just (VNat 9)
     ]

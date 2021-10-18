@@ -22,20 +22,6 @@ eval (EMul e1 e2) =
 
 eval (EIf e1 e2 e3) =
     do VBool n1 <- eval e1
-       VNat n2 <- eval e2
-       VNat n3 <- eval e3
-
-       if n1 == True
-           then return (VNat n2)
-           else return (VNat n3)
-
-
-
-eval (EIf e1 e2 e3) =
-    do VBool n1 <- eval e1
-       VBool n2 <- eval e2
-       VBool n3 <- eval e3
-
-       if n1 == True
-           then return (VBool n2)
-           else return (VBool n3)
+       if n1
+        then (eval e2)
+        else (eval e3)
