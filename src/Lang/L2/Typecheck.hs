@@ -21,20 +21,23 @@ infer (ENat _) =
 infer (EBool _) =
   return TBool
 infer (EAdd e1 e2) =
-  do TNat <- infer e1
-     TNat <- infer e2
-     return TNat
+  do
+    TNat <- infer e1
+    TNat <- infer e2
+    return TNat
 infer (EMul e1 e2) =
-  do TNat <- infer e1
-     TNat <- infer e2
-     return TNat
+  do
+    TNat <- infer e1
+    TNat <- infer e2
+    return TNat
 infer (EIf e1 e2 e3) =
-  do TBool <- infer e1
-     ty2 <- infer e2
-     ty3 <- infer e3
-     if ty2 == ty3
-       then return ty2
-       else Nothing
+  do
+    TBool <- infer e1
+    ty2 <- infer e2
+    ty3 <- infer e3
+    if ty2 == ty3
+      then return ty2
+      else Nothing
 
 -- if infer e1 == Just TBool && infer e2 == infer e3 then infer e2 else Nothing
 -- infer (EIf e1 e2 e3) = if check e1 TBool then if e1 == (EBool True) then infer e2 else infer e3 else Nothing

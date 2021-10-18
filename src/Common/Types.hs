@@ -2,8 +2,8 @@
 module Common.Types where
 
 import Numeric.Natural
-import Test.QuickCheck
 import Prettyprinter
+import Test.QuickCheck
 
 data Nat = Zero | Succ Nat deriving (Eq, Ord)
 
@@ -40,7 +40,6 @@ instance Num Nat where
 instance Arbitrary Nat where
   arbitrary = fromNatural <$> arbitrarySizedNatural `suchThat` \n -> n < 20
   shrink = fmap fromNatural . shrinkIntegral . toNatural
-
 
 instance Pretty Nat where
   pretty = pretty . toNatural

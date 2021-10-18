@@ -3,9 +3,9 @@
 module Lang.L2.Tests (unitTests, propertyTests) where
 
 import Common.Types
+import Lang.L2.Eval
 import Lang.L2.Syntax
 import Lang.L2.Typecheck
-import Lang.L2.Eval
 import Test.Tasty
 import Test.Tasty.HUnit
 import Test.Tasty.QuickCheck as QC
@@ -13,28 +13,25 @@ import Test.Tasty.QuickCheck as QC
 propertyTests :: TestTree
 propertyTests = testGroup "L2 Property tests" [evalL2Props, l2Props]
 
-
 evalL2Props :: TestTree
 evalL2Props =
   testGroup
     "eval"
-    [
-      QC.testProperty "eval of Nat is itself" $
+    [ QC.testProperty "eval of Nat is itself" $
         \(x :: Nat) -> eval (ENat x) == Just (VNat x),
       QC.testProperty "eval of Add is +" $
         \(x :: Nat) (y :: Nat) ->
-          eval (EAdd (ENat x) (ENat y)) == Just (VNat (x+y)),
+          eval (EAdd (ENat x) (ENat y)) == Just (VNat (x + y)),
       QC.testProperty "eval of Mul is *" $
         \(x :: Nat) (y :: Nat) ->
-          eval (EMul (ENat x) (ENat y)) == Just (VNat (x*y)),
+          eval (EMul (ENat x) (ENat y)) == Just (VNat (x * y)),
       QC.testProperty "eval of EIf True is *" $
-        \(y :: Exp) (z::Exp) ->
-          eval (EIf (EBool True) (y) (z)) == eval(y),
+        \(y :: Exp) (z :: Exp) ->
+          eval (EIf (EBool True) y z) == eval y,
       QC.testProperty "eval of EIf False is *" $
-        \(y :: Exp) (z::Exp) ->
-          eval (EIf (EBool False) (y) (z)) == eval(z)
+        \(y :: Exp) (z :: Exp) ->
+          eval (EIf (EBool False) y z) == eval z
     ]
-
 
 l2Props :: TestTree
 l2Props =
@@ -68,7 +65,7 @@ unitL2Tests =
       testCase "Unit on L2 1" $
         check (EIf (EBool False) (ENat 2) (EAdd (ENat 1) (ENat 3))) TNat @?= True,
       testCase "Unit on L2 2" $
-        check (EIf (EBool ((False && False) || (True))) (EBool True) (EBool False)) TBool @?= True,
+        check (EIf (EBool ((False) || True)) (EBool True) (EBool False)) TBool @?= True,
       testCase "Unit on L2 3" $
         check (EAdd (ENat 1) (ENat 2)) TNat @?= True,
       testCase "Unit on L2 4" $
@@ -86,18 +83,17 @@ unitL2Tests =
       testCase "Unit on L2 infer 2" $
         infer (EAdd (ENat 1) (ENat 2)) @?= Just TNat,
       testCase "Unit on L2 infer 3" $
-        infer (EBool (True && False)) @?= Just TBool,
+        infer (EBool False) @?= Just TBool,
       testCase "Unit on L2 infer 4" $
         infer (EIf (EBool True) (EAdd (ENat 1) (ENat 2)) (EMul (ENat 3) (ENat 4))) @?= Just TNat,
       testCase "Unit on L2 infer 5" $
         infer (EIf (EIf (EBool True) (EBool True) (EBool True)) (EAdd (ENat 1) (ENat 2)) (EMul (ENat 3) (ENat 4))) @?= Just TNat,
       testCase "Unit on L2 infer 6" $
-        infer (EIf(EIf (EBool True) (EBool False) (EBool True)) (ENat 5) (ENat 6)) @?= Just TNat,
-
+        infer (EIf (EIf (EBool True) (EBool False) (EBool True)) (ENat 5) (ENat 6)) @?= Just TNat,
       testCase "Unit on L2 eval 0" $
-        eval(ENat 1) @?= Just (VNat 1),
+        eval (ENat 1) @?= Just (VNat 1),
       testCase "Unit on L2 eval 1" $
-        eval(EAdd (EIf (EBool True) (ENat 1) (ENat 2)) (ENat 3)) @?= Just (VNat 4),
+        eval (EAdd (EIf (EBool True) (ENat 1) (ENat 2)) (ENat 3)) @?= Just (VNat 4),
       testCase "Unit on L2 eval 2" $
-        eval(EIf (EIf (EBool True) (EBool False) (EAdd (ENat 1) (ENat 2))) (ENat 3) (EAdd (ENat 4) (ENat 5))) @?= Just (VNat 9)
+        eval (EIf (EIf (EBool True) (EBool False) (EAdd (ENat 1) (ENat 2))) (ENat 3) (EAdd (ENat 4) (ENat 5))) @?= Just (VNat 9)
     ]
