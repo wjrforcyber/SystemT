@@ -30,6 +30,7 @@ library
         Lang.L1.Eval
         Lang.L2.Syntax
         Lang.L2.Typecheck
+        Lang.L2.Eval
     other-modules:
     hs-source-dirs:   src
 

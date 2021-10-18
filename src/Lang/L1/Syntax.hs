@@ -4,12 +4,12 @@ module Lang.L1.Syntax where
 import Common.Types
 import Prettyprinter ((<+>))
 import qualified Prettyprinter as PP
+import Test.QuickCheck
 import Text.Parsec
 import Text.Parsec.Expr
 import Text.Parsec.Language (emptyDef)
 import Text.Parsec.String
 import qualified Text.Parsec.Token as P
-import Test.QuickCheck
 
 data Exp
   = ENat Nat
@@ -63,10 +63,9 @@ instance PP.Pretty Exp where
   pretty = prettyExp
 
 prettyExp :: Exp -> PP.Doc ann
-prettyExp (ENat n)     = PP.pretty n
+prettyExp (ENat n) = PP.pretty n
 prettyExp (EAdd e1 e2) = PP.parens (prettyExp e1 <+> PP.pretty "+" <+> prettyExp e2)
 prettyExp (EMul e1 e2) = PP.parens (prettyExp e1 <+> PP.pretty "*" <+> prettyExp e2)
-
 
 unsafeParse :: String -> Exp
 unsafeParse s =
@@ -74,12 +73,10 @@ unsafeParse s =
     Left _ -> error "invalid expression"
     Right expre -> expre
 
-
 hasEMul :: Exp -> Bool
 hasEMul (ENat _) = False
 hasEMul (EAdd e1 e2) = hasEMul e1 || hasEMul e2
 hasEMul (EMul _ _) = True
-
 
 instance Arbitrary Exp where
   arbitrary = sized arbExp

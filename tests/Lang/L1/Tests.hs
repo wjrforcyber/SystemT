@@ -1,10 +1,10 @@
 {-# LANGUAGE ScopedTypeVariables #-}
+
 module Lang.L1.Tests (unitTests, propertyTests) where
 
 import Common.Types
 import Lang.L1.Eval
 import Lang.L1.Syntax
-
 import qualified Prettyprinter as PP
 import Test.Tasty
 import Test.Tasty.HUnit

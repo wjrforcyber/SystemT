@@ -1,10 +1,9 @@
 -- | This is a test suite.
 module Main where
 
-import Test.Tasty
-
 import qualified Lang.L1.Tests as L1
 import qualified Lang.L2.Tests as L2
+import Test.Tasty
 
 main :: IO ()
 main = defaultMain tests
