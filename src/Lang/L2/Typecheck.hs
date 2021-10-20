@@ -7,7 +7,6 @@ import Test.QuickCheck
 newtype TyExp = TyExp {getExp :: Exp}
   deriving (Eq, Show)
 
-
 -- | The 'check' function takes an expression and a type and checks if the expression satisfies the type.
 check :: Exp -> Ty -> Bool
 check (ENat _) TNat = True
