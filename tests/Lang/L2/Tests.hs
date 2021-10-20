@@ -99,5 +99,13 @@ unitL2Tests =
       testCase "Unit on L2 eval 1" $
         eval (EAdd (EIf (EBool True) (ENat 1) (ENat 2)) (ENat 3)) @?= Just (VNat 4),
       testCase "Unit on L2 eval 2" $
-        eval (EIf (EIf (EBool True) (EBool False) (EAdd (ENat 1) (ENat 2))) (ENat 3) (EAdd (ENat 4) (ENat 5))) @?= Just (VNat 9)
+        eval (EIf (EIf (EBool True) (EBool False) (EAdd (ENat 1) (ENat 2))) (ENat 3) (EAdd (ENat 4) (ENat 5))) @?= Just (VNat 9),
+      testCase "Unit on L2 TC tcchecker 0" $
+        tccheck (EAdd (EIf (EBool True) (ENat 1) (ENat 2)) (ENat 3)) TNat @?= TC (Right ()),
+      testCase "Unit on L2 TC tcchecker 1" $
+        tccheck (EIf (EIf (EBool True) (EBool True) (EBool False)) (ENat 3) (EAdd (ENat 4) (ENat 5))) TNat @?= TC (Right ()),
+      testCase "Unit on L2 TC tcinfer 0" $
+        tcinfer (EAdd (ENat 1) (ENat 2)) @?= TC (Right TNat),
+      testCase "Unit on L2 TC tcinfer 1" $
+        tcinfer (EIf (EIf (EBool True) (EBool False) (EBool True)) (ENat 5) (ENat 6)) @?= TC (Right TNat)
     ]
