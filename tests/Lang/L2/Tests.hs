@@ -3,6 +3,7 @@
 module Lang.L2.Tests (unitTests, propertyTests) where
 
 import Common.Types
+import Data.Maybe
 import Lang.L2.Eval
 import Lang.L2.Syntax
 import Lang.L2.Typecheck
@@ -30,7 +31,10 @@ evalL2Props =
           eval (EIf (EBool True) y z) == eval y,
       QC.testProperty "eval of EIf False is *" $
         \(y :: Exp) (z :: Exp) ->
-          eval (EIf (EBool False) y z) == eval z
+          eval (EIf (EBool False) y z) == eval z,
+      QC.testProperty "Well-typed expressions reduced to a value" $
+        \(e :: TyExp) ->
+          isJust (eval (getExp e))
     ]
 
 l2Props :: TestTree

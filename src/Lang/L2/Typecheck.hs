@@ -1,6 +1,12 @@
 module Lang.L2.Typecheck where
 
+import Data.Maybe
 import Lang.L2.Syntax
+import Test.QuickCheck
+
+newtype TyExp = TyExp {getExp :: Exp}
+  deriving (Eq, Show)
+
 
 -- | The 'check' function takes an expression and a type and checks if the expression satisfies the type.
 check :: Exp -> Ty -> Bool
@@ -38,6 +44,9 @@ infer (EIf e1 e2 e3) =
     if ty2 == ty3
       then return ty2
       else Nothing
+
+instance Arbitrary TyExp where
+  arbitrary = TyExp <$> (arbitrary `suchThat` \e -> isJust $ infer e)
 
 -- if infer e1 == Just TBool && infer e2 == infer e3 then infer e2 else Nothing
 -- infer (EIf e1 e2 e3) = if check e1 TBool then if e1 == (EBool True) then infer e2 else infer e3 else Nothing

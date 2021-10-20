@@ -22,11 +22,15 @@ data Val
   | VBool Bool
   deriving (Eq, Show)
 
+
 instance Arbitrary Ty where
   arbitrary = oneof [pure TNat, pure TBool]
 
 instance Arbitrary Exp where
   arbitrary = sized arbExp
+
+
+
 
 arbExp :: Int -> Gen Exp
 arbExp 0 =
