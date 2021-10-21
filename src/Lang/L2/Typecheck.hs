@@ -22,6 +22,13 @@ instance Applicative TC where
   (TC (Left x)) <*> _ = TC (Left x)
   (TC (Right f)) <*> y = fmap f y
 
+instance Monad TC where
+  return x = TC (Right x)
+  TC (Left x) >>= _ = TC (Left x)
+  (TC (Right x)) >>= f = f x
+
+-- fail _ = TC (Left x)
+
 -- | The 'check' function takes an expression and a type and checks if the expression satisfies the type.
 check :: Exp -> Ty -> Bool
 check (ENat _) TNat = True
@@ -30,9 +37,6 @@ check (EAdd e1 e2) TNat = check e1 TNat && check e2 TNat
 check (EMul e1 e2) TNat = check e1 TNat && check e2 TNat
 check (EIf e1 e2 e3) ty = check e1 TBool && (check e2 ty && check e3 ty)
 check _ _ = False
-
--- check (EIf e1 e2 e3) TNat =  if check e1 TBool then if e1 == (EBool True) then check e2 TNat else check e3 TNat else False
--- check (EIf e1 e2 e3) TBool = if check e1 TBool then if e1 == (EBool True) then check e2 TBool else check e3 TBool else False
 
 -- | The 'infer' function takes an expression and tries to infer a correct type for it.
 infer :: Exp -> Maybe Ty
@@ -62,32 +66,57 @@ infer (EIf e1 e2 e3) =
 instance Arbitrary TyExp where
   arbitrary = TyExp <$> (arbitrary `suchThat` \e -> isJust $ infer e)
 
--- if infer e1 == Just TBool && infer e2 == infer e3 then infer e2 else Nothing
--- infer (EIf e1 e2 e3) = if check e1 TBool then if e1 == (EBool True) then infer e2 else infer e3 else Nothing
-
+--TC Check
 tccheck :: Exp -> Ty -> TC ()
-tccheck (ENat _) TNat = TC (Right ())
-tccheck (EBool _) TBool = TC (Right ())
-tccheck (EAdd e1 e2) TNat = if tccheck e1 TNat == TC (Right ()) && tccheck e2 TNat == TC (Right ()) then TC (Right ()) else TC (Left "check: EAdd has wrong expression")
-tccheck (EMul e1 e2) TNat = if tccheck e1 TNat == TC (Right ()) && tccheck e2 TNat == TC (Right ()) then TC (Right ()) else TC (Left "check: EMul has wrong expression")
+tccheck (ENat _) TNat = return ()
+tccheck (EBool _) TBool = return ()
+tccheck (EAdd e1 e2) TNat =
+  do
+    tc1 <- tccheck e1 TNat
+    tc2 <- tccheck e2 TNat
+    if tc1 == () && tc2 == ()
+      then return ()
+      else TC (Left "EAdd has wrong expression")
+tccheck (EMul e1 e2) TNat =
+  do
+    tc1 <- tccheck e1 TNat
+    tc2 <- tccheck e2 TNat
+    if tc1 == () && tc2 == ()
+      then return ()
+      else TC (Left "EMul has wrong expression")
 tccheck (EIf e1 e2 e3) ty =
-  if tccheck e1 TBool == TC (Right ())
-    then
-      if tccheck e2 ty == tccheck e3 ty
-        then TC (Right ())
-        else TC (Left "check: EIf has wrong expression in last two expression")
-    else TC (Left "check: First expression in EIf is not available")
+  do
+    tc1 <- tccheck e1 TBool
+    tc2 <- tccheck e2 ty
+    tc3 <- tccheck e3 ty
+    if tc1 == () && tc2 == () && tc3 == ()
+      then return ()
+      else TC (Left "EMul has wrong expression")
 tccheck _ _ = TC (Left "Pattern not matching the defined expression!")
 
+--TC infer
 tcinfer :: Exp -> TC Ty
-tcinfer (ENat _) = TC (Right TNat)
-tcinfer (EBool _) = TC (Right TBool)
-tcinfer (EAdd e1 e2) = if tcinfer e1 == TC (Right TNat) && tcinfer e2 == TC (Right TNat) then TC (Right TNat) else TC (Left "infer:EAdd has wrong expression")
-tcinfer (EMul e1 e2) = if tcinfer e1 == TC (Right TNat) && tcinfer e2 == TC (Right TNat) then TC (Right TNat) else TC (Left "infer:EAdd has wrong expression")
+tcinfer (ENat _) = return TNat
+tcinfer (EBool _) = return TBool
+tcinfer (EAdd e1 e2) =
+  do
+    tcin1 <- tcinfer e1
+    tcin2 <- tcinfer e2
+    if tcin1 == TNat && tcin2 == TNat
+      then return TNat
+      else TC (Left "infer:EAdd has wrong expression")
+tcinfer (EMul e1 e2) =
+  do
+    tcin1 <- tcinfer e1
+    tcin2 <- tcinfer e2
+    if tcin1 == TNat && tcin2 == TNat
+      then return TNat
+      else TC (Left "infer:EAdd has wrong expression")
 tcinfer (EIf e1 e2 e3) =
-  if tcinfer e1 == TC (Right TBool)
-    then
-      if tcinfer e2 == tcinfer e3
-        then tcinfer e2
-        else TC (Left "infer: EIf has wrong expression in last two expression")
-    else TC (Left "infer: First expression in EIf is not available")
+  do
+    tcin1 <- tcinfer e1
+    tcin2 <- tcinfer e2
+    tcin3 <- tcinfer e3
+    if tcin1 == TBool && (tcin2 == tcin3)
+      then return tcin2
+      else TC (Left "infer:EIf has wrong expression")

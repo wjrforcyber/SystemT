@@ -14,7 +14,7 @@ common common-deps
     mtl >= 2.2,
     parsec >= 3.1.14.0,
     prettyprinter >= 1.7.1,
-    QuickCheck >= 2.14.2
+    QuickCheck >= 2.14.2,
   ghc-options:
     -Wall
     -Wextra
