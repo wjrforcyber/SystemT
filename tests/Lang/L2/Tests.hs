@@ -21,10 +21,10 @@ tcL2Props =
     "Bidi-typecheck"
     [ QC.testProperty "if a type can be inferred then it can be checked for the same type" $
         \(e :: Exp) (ty :: Ty) ->
-          if (tcinfer e == (return ty)) then (tccheck e (ty) == return ()) else True,
+          not (tcinfer e == (return ty)) || (tccheck e (ty) == return ()),
       QC.testProperty "if a type can be checked with nat, then it will also be inferred to nat" $
         \(e :: Exp) (ty :: Ty) ->
-          if (tccheck e (ty) == return ()) then (tcinfer e == (return ty)) else True,
+          not (tccheck e (ty) == return ()) || (tcinfer e == (return ty)),
       QC.testProperty "every well-typed expression can be inferred" $
         \(e :: TcTyExp) ->
           isRight (return (tcinfer (tcgetExp e)))
