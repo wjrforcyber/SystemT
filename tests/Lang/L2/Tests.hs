@@ -3,6 +3,7 @@
 module Lang.L2.Tests (unitTests, propertyTests) where
 
 import Common.Types
+import Data.Either
 import Data.Maybe
 import Lang.L2.Eval
 import Lang.L2.Syntax
@@ -12,7 +13,22 @@ import Test.Tasty.HUnit
 import Test.Tasty.QuickCheck as QC
 
 propertyTests :: TestTree
-propertyTests = testGroup "L2 Property tests" [evalL2Props, l2Props]
+propertyTests = testGroup "L2 Property tests" [tcL2Props, evalL2Props, l2Props]
+
+tcL2Props :: TestTree
+tcL2Props =
+  testGroup
+    "Bidi-typecheck"
+    [ QC.testProperty "if a type can be inferred then it can be checked for the same type" $
+        \(e :: TcTyExp) (ty :: Ty) ->
+          if (tcinfer (tcgetExp e) == (return ty)) then (tccheck (tcgetExp e) (ty) == return ()) else True,
+      QC.testProperty "if a type can be checked with nat, then it will also be inferred to nat" $
+        \(e :: TcTyExp) (ty :: Ty) ->
+          if (tccheck (tcgetExp e) (ty) == return ()) then (tcinfer (tcgetExp e) == (return ty)) else True,
+      QC.testProperty "every well-typed expression can be inferred" $
+        \(e :: TcTyExp) ->
+          isRight (return (tcinfer (tcgetExp e)))
+    ]
 
 evalL2Props :: TestTree
 evalL2Props =

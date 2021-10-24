@@ -1,10 +1,14 @@
 module Lang.L2.Typecheck where
 
+import Data.Either (isRight)
 import Data.Maybe
 import Lang.L2.Syntax
 import Test.QuickCheck
 
 newtype TyExp = TyExp {getExp :: Exp}
+  deriving (Eq, Show)
+
+newtype TcTyExp = TcTyExp {tcgetExp :: Exp}
   deriving (Eq, Show)
 
 newtype TC a = TC {runTC :: Either TCError a}
@@ -64,6 +68,9 @@ infer (EIf e1 e2 e3) =
 instance Arbitrary TyExp where
   arbitrary = TyExp <$> (arbitrary `suchThat` \e -> isJust $ infer e)
 
+instance Arbitrary TcTyExp where
+  arbitrary = TcTyExp <$> (arbitrary `suchThat` \e -> isRight $ return (tcinfer e))
+
 --TC Check
 tccheck :: Exp -> Ty -> TC ()
 tccheck (ENat _) TNat = return ()
@@ -84,7 +91,7 @@ tccheck (EIf e1 e2 e3) ty =
     _ <- tccheck e2 ty
     _ <- tccheck e3 ty
     return ()
-tccheck _ _ = TC (Left "check: e is not a type of ty!")
+tccheck e ty = TC (Left ("check: " ++ show e ++ "is not a type of" ++ show ty ++ "!\n"))
 
 --TC infer
 tcinfer :: Exp -> TC Ty
@@ -107,4 +114,13 @@ tcinfer (EIf e1 e2 e3) =
     tcin3 <- tcinfer e3
     if tcin2 == tcin3
       then return tcin2
-      else TC (Left "infer:EIf has different type in last two expression!")
+      else
+        TC
+          ( Left
+              ( "infer: " ++ "EIf has different type in last two expression:\n" ++ show e2 ++ "has type of" ++ show tcin2 ++ "\n"
+                  ++ show e3
+                  ++ "has type of"
+                  ++ show tcin3
+                  ++ "\n"
+              )
+          )
