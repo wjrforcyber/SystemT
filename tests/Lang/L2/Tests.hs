@@ -3,7 +3,6 @@
 module Lang.L2.Tests (unitTests, propertyTests) where
 
 import Common.Types
-import Data.Either
 import Data.Maybe
 import Lang.L2.Eval
 import Lang.L2.Syntax
@@ -19,15 +18,28 @@ tcL2Props :: TestTree
 tcL2Props =
   testGroup
     "Bidi-typecheck"
-    [ QC.testProperty "if a type can be inferred then it can be checked for the same type" $
-        \(e :: Exp) (ty :: Ty) ->
-          tcinfer e /= return ty || (tccheck e ty == return ()),
-      QC.testProperty "if a type can be checked with nat, then it will also be inferred to nat" $
-        \(e :: Exp) (ty :: Ty) ->
-          tccheck e ty /= return () || (tcinfer e == return ty),
-      QC.testProperty "every well-typed expression can be inferred" $
+    [ QC.testProperty "if a type can be checked with nat, then it will also be inferred to nat" $
+        \(e :: Exp) ->
+          tccheck e TNat /= return () || (tcinfer e == return TNat),
+      QC.testProperty "if a type can be checked with bool, then it will also be inferred to bool" $
+        \(e :: Exp) ->
+          tccheck e TBool /= return () || (tcinfer e == return TBool),
+      QC.testProperty "1-every well-typed expression can be inferred" $
+        \(e :: TyExp) ->
+          tcisSuccess (tcinfer (getExp e)),
+      QC.testProperty "1-every well-typed expression can be checked for its type" $
+        \(e :: TyExp) ->
+          case runTC (tcinfer (getExp e)) of
+            Right ty -> tcisSuccess $ tccheck (getExp e) ty
+            Left _ -> error $ "This cannot happen because" ++ show e ++ " is well-typed",
+      QC.testProperty "2-every well-typed expression can be inferred" $
         \(e :: TcTyExp) ->
-          isRight (return (tcinfer (tcgetExp e)))
+          tcisSuccess (tcinfer (tcgetExp e)),
+      QC.testProperty "2-every well-typed expression can be checked for its type" $
+        \(e :: TcTyExp) ->
+          case runTC (tcinfer (tcgetExp e)) of
+            Right ty -> tcisSuccess $ tccheck (tcgetExp e) ty
+            Left _ -> error $ "This cannot happen because" ++ show e ++ " is well-typed"
     ]
 
 evalL2Props :: TestTree

@@ -1,6 +1,6 @@
 module Lang.L2.Typecheck where
 
-import Data.Either (isRight)
+-- import Data.Either (isRight)
 import Data.Maybe
 import Lang.L2.Syntax
 import Test.QuickCheck
@@ -30,6 +30,13 @@ instance Monad TC where
   return x = TC (Right x)
   TC (Left x) >>= _ = TC (Left x)
   (TC (Right x)) >>= f = f x
+
+tcfail :: TCError -> TC a
+tcfail msg = TC (Left msg)
+
+tcisSuccess :: TC a -> Bool
+tcisSuccess (TC (Left _)) = False
+tcisSuccess (TC (Right _)) = True
 
 -- | The 'check' function takes an expression and a type and checks if the expression satisfies the type.
 check :: Exp -> Ty -> Bool
@@ -69,7 +76,7 @@ instance Arbitrary TyExp where
   arbitrary = TyExp <$> (arbitrary `suchThat` \e -> isJust $ infer e)
 
 instance Arbitrary TcTyExp where
-  arbitrary = TcTyExp <$> (arbitrary `suchThat` \e -> isRight $ return (tcinfer e))
+  arbitrary = TcTyExp <$> (arbitrary `suchThat` \e -> tcisSuccess $ tcinfer e)
 
 --TC Check
 tccheck :: Exp -> Ty -> TC ()
