@@ -60,9 +60,12 @@ evalL2Props =
       QC.testProperty "eval of EIf False is *" $
         \(y :: Exp) (z :: Exp) ->
           eval (EIf (EBool False) y z) == eval z,
-      QC.testProperty "Well-typed expressions reduced to a value" $
+      QC.testProperty "1-Well-typed expressions reduced to a value" $
         \(e :: TyExp) ->
-          isJust (eval (getExp e))
+          isJust (eval (getExp e)),
+      QC.testProperty "2-Well-typed expressions reduced to a value" $
+        \(e :: TcTyExp) ->
+          isJust (eval (tcgetExp e))
     ]
 
 l2Props :: TestTree

@@ -1,6 +1,5 @@
 module Lang.L2.Typecheck where
 
--- import Data.Either (isRight)
 import Data.Maybe
 import Lang.L2.Syntax
 import Test.QuickCheck
@@ -17,7 +16,7 @@ newtype TC a = TC {runTC :: Either TCError a}
 type TCError = String
 
 instance Functor TC where
-  -- fmap:: (a -> b) -> TC a -> TC b
+
   fmap _ (TC (Left x)) = TC (Left x)
   fmap f (TC (Right y)) = TC (Right (f y))
 
@@ -98,7 +97,7 @@ tccheck (EIf e1 e2 e3) ty =
     _ <- tccheck e2 ty
     _ <- tccheck e3 ty
     return ()
-tccheck e ty = TC (Left ("check: " ++ show e ++ "is not a type of" ++ show ty ++ "!\n"))
+tccheck e ty = tcfail ("check: " ++ show e ++ "is not a type of" ++ show ty ++ "!\n")
 
 --TC infer
 tcinfer :: Exp -> TC Ty
