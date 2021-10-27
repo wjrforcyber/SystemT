@@ -6,10 +6,10 @@ import Lang.L3.Syntax
 eval :: Exp -> Maybe Val
 eval EZero = Just (VSuccN 0)
 eval (ESucc EZero) = Just (VSuccN 1)
-eval (ESucc (ESucc e)) =
+eval (ESucc e) =
   do
     VSuccN n <- eval e
-    return $ VSuccN (n + 1)
+    return $ VSuccN (1 + n)
 eval ETrue = Just VTrue
 eval EFalse = Just VFalse
 eval (EAdd e1 e2) =
@@ -28,4 +28,3 @@ eval (EIf e1 e2 e3) =
     if b1 == VTrue
       then eval e2
       else eval e3
-eval _ = Nothing
