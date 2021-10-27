@@ -32,6 +32,9 @@ library
         Lang.L2.Syntax
         Lang.L2.Typecheck
         Lang.L2.Eval
+        Lang.L3.Syntax
+        Lang.L3.Eval
+        Lang.L3.Typecheck
 
     other-modules:
     hs-source-dirs:   src
@@ -49,6 +52,7 @@ test-suite test
     other-modules:
         Lang.L1.Tests
         Lang.L2.Tests
+        Lang.L3.Tests
     hs-source-dirs: tests
     ghc-options:    -threaded -with-rtsopts=-N
     build-depends:

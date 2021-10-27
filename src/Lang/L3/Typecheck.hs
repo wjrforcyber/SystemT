@@ -1,7 +1,7 @@
-module Lang.L2.Typecheck where
+module Lang.L3.Typecheck where
 
 import Data.Maybe
-import Lang.L2.Syntax
+import Lang.L3.Syntax
 import Test.QuickCheck
 
 newtype TyExp = TyExp {getExp :: Exp}
@@ -38,8 +38,10 @@ tcisSuccess (TC (Right _)) = True
 
 -- | The 'check' function takes an expression and a type and checks if the expression satisfies the type.
 check :: Exp -> Ty -> Bool
-check (ENat _) TNat = True
-check (EBool _) TBool = True
+check EZero TNat = True
+check (ESucc e) TNat = check e TNat
+check ETrue TBool = True
+check EFalse TBool = False
 check (EAdd e1 e2) TNat = check e1 TNat && check e2 TNat
 check (EMul e1 e2) TNat = check e1 TNat && check e2 TNat
 check (EIf e1 e2 e3) ty = check e1 TBool && (check e2 ty && check e3 ty)
@@ -47,9 +49,15 @@ check _ _ = False
 
 -- | The 'infer' function takes an expression and tries to infer a correct type for it.
 infer :: Exp -> Maybe Ty
-infer (ENat _) =
+infer EZero =
   return TNat
-infer (EBool _) =
+infer (ESucc e) =
+  do
+    TNat <- infer e
+    return TNat
+infer ETrue =
+  return TBool
+infer EFalse =
   return TBool
 infer (EAdd e1 e2) =
   do
@@ -78,8 +86,13 @@ instance Arbitrary TcTyExp where
 
 --TC Check
 tccheck :: Exp -> Ty -> TC ()
-tccheck (ENat _) TNat = return ()
-tccheck (EBool _) TBool = return ()
+tccheck EZero TNat = return ()
+tccheck (ESucc e) TNat =
+  do
+    _ <- tccheck e TNat
+    return ()
+tccheck ETrue TBool = return ()
+tccheck EFalse TBool = return ()
 tccheck (EAdd e1 e2) TNat =
   do
     _ <- tccheck e1 TNat
@@ -96,12 +109,17 @@ tccheck (EIf e1 e2 e3) ty =
     _ <- tccheck e2 ty
     _ <- tccheck e3 ty
     return ()
-tccheck e ty = tcfail ("check: " ++ show e ++ "is not a type of" ++ show ty ++ "!\n")
+tccheck e ty = tcfail ("check: " ++ show e ++ " is not an expression of type " ++ show ty ++ "!")
 
 --TC infer
 tcinfer :: Exp -> TC Ty
-tcinfer (ENat _) = return TNat
-tcinfer (EBool _) = return TBool
+tcinfer EZero = return TNat
+tcinfer (ESucc e) =
+  do
+    _ <- tccheck e TNat
+    return TNat
+tcinfer ETrue = return TBool
+tcinfer EFalse = return TBool
 tcinfer (EAdd e1 e2) =
   do
     _ <- tccheck e1 TNat
