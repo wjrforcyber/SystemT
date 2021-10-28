@@ -1,8 +1,9 @@
-{-# LANGUAGE GADTs #-}
-{-# LANGUAGE TypeFamilies#-}
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE TypeFamilies #-}
+
 -- | This is the Syntax of L3.
-module Lang.L3.Syntax where
+module Lang.L3.Syntax.Intrinsic where
 
 import Common.Types
 import Test.QuickCheck
@@ -14,11 +15,11 @@ data Ty
 
 data Exp :: Ty -> * where
   EZero :: Exp TNat
-  ESucc :: Exp TNat
+  ESucc :: Exp TNat -> Exp TNat
   ETrue :: Exp TBool
-  EFalse:: Exp TBool
-  EAdd  :: Exp TNat -> Exp TNat -> Exp TNat
-  EMul  :: Exp TNat -> Exp TNat -> Exp TNat
+  EFalse :: Exp TBool
+  EAdd :: Exp TNat -> Exp TNat -> Exp TNat
+  EMul :: Exp TNat -> Exp TNat -> Exp TNat
   EIf :: Exp TBool -> Exp ty -> Exp ty -> Exp ty
   deriving (Eq, Show)
 

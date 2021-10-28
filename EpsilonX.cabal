@@ -32,7 +32,8 @@ library
         Lang.L2.Syntax
         Lang.L2.Typecheck
         Lang.L2.Eval
-        Lang.L3.Syntax
+        Lang.L3.Syntax.Extrinsic
+        Lang.L3.Syntax.Intrinsic
         Lang.L3.Eval
         Lang.L3.Typecheck
 

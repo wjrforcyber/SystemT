@@ -2,7 +2,7 @@
 
 module Lang.L3.Typecheck where
 
-import Lang.L3.Syntax
+import Lang.L3.Syntax.Extrinsic
 import Test.QuickCheck
 
 newtype TcTyExp = TcTyExp {tcgetExp :: Exp}

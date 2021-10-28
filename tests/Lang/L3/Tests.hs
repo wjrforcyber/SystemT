@@ -4,7 +4,8 @@ module Lang.L3.Tests (propertyTests) where
 
 import Data.Maybe
 import Lang.L3.Eval
-import Lang.L3.Syntax
+import Lang.L3.Syntax.Extrinsic
+import Lang.L3.Syntax.Intrinsic
 import Lang.L3.Typecheck
 import Test.Tasty
 import Test.Tasty.QuickCheck as QC
@@ -36,7 +37,10 @@ evalL3Props :: TestTree
 evalL3Props =
   testGroup
     "eval"
-    [ QC.testProperty "2-Well-typed expressions reduced to a value" $
+    [ QC.testProperty "1-Well-typed expressions reduced to a value" $
         \(e :: TcTyExp) ->
-          isJust (eval (tcgetExp e))
+          isJust (eval (tcgetExp e)),
+      QC.testProperty "2-Well-typed expressions reduced to a value" $
+        \(e :: TcTyExp) ->
+          isJust (evali (tcgetExp e))
     ]
