@@ -1,4 +1,4 @@
--- | This is the Syntax of L2.
+-- | This is the Syntax of L3.
 module Lang.L3.Syntax where
 
 import Common.Types
