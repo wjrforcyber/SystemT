@@ -3,7 +3,6 @@ module Lang.L3.Syntax where
 
 import Common.Types
 import Test.QuickCheck
-import Test.QuickCheck.Gen
 
 data Ty
   = TNat
@@ -24,7 +23,7 @@ data Val
   = VSuccN Nat
   | VTrue
   | VFalse
-  deriving (Eq)
+  deriving (Eq, Show)
 
 instance Arbitrary Ty where
   arbitrary = oneof [pure TNat, pure TBool]
@@ -35,16 +34,15 @@ instance Arbitrary Exp where
 arbExp :: Int -> Gen Exp
 arbExp 0 =
   oneof
-    [ MkGen (\_ _ -> EZero),
-      MkGen (\_ _ -> ETrue),
-      MkGen (\_ _ -> EFalse)
+    [ pure EZero,
+      pure ETrue,
+      pure EFalse
     ]
 arbExp n = do
   (Positive m) <- arbitrary
   let subExp = arbExp (n `div` (m + 1))
   oneof
-    [ subExp,
-      ESucc <$> subExp,
+    [ ESucc <$> subExp,
       EAdd <$> subExp <*> subExp,
       EMul <$> subExp <*> subExp,
       EIf <$> subExp <*> subExp <*> subExp

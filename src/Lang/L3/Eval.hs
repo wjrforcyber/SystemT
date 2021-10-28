@@ -5,7 +5,6 @@ import Lang.L3.Syntax
 
 eval :: Exp -> Maybe Val
 eval EZero = Just (VSuccN 0)
-eval (ESucc EZero) = Just (VSuccN 1)
 eval (ESucc e) =
   do
     VSuccN n <- eval e
