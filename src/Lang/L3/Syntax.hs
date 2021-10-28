@@ -1,3 +1,6 @@
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE TypeFamilies#-}
+{-# LANGUAGE DataKinds #-}
 -- | This is the Syntax of L3.
 module Lang.L3.Syntax where
 
@@ -9,14 +12,14 @@ data Ty
   | TBool
   deriving (Eq, Show)
 
-data Exp
-  = EZero
-  | ESucc Exp
-  | ETrue
-  | EFalse
-  | EAdd Exp Exp
-  | EMul Exp Exp
-  | EIf Exp Exp Exp
+data Exp :: Ty -> * where
+  EZero :: Exp TNat
+  ESucc :: Exp TNat
+  ETrue :: Exp TBool
+  EFalse:: Exp TBool
+  EAdd  :: Exp TNat -> Exp TNat -> Exp TNat
+  EMul  :: Exp TNat -> Exp TNat -> Exp TNat
+  EIf :: Exp TBool -> Exp ty -> Exp ty -> Exp ty
   deriving (Eq, Show)
 
 data Val
