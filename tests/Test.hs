@@ -3,7 +3,7 @@ module Main where
 
 import qualified Lang.L1.Tests as L1
 import qualified Lang.L2.Tests as L2
-
+import qualified Lang.L3.Tests as L3
 import Test.Tasty
 
 main :: IO ()
@@ -16,4 +16,4 @@ unitTests :: TestTree
 unitTests = testGroup "Unit tests" [L1.unitTests, L2.unitTests]
 
 propertyTests :: TestTree
-propertyTests = testGroup "Property tests" [L1.propertyTests, L2.propertyTests]
+propertyTests = testGroup "Property tests" [L1.propertyTests, L2.propertyTests, L3.propertyTests]

@@ -16,7 +16,6 @@ newtype TC a = TC {runTC :: Either TCError a}
 type TCError = String
 
 instance Functor TC where
-
   fmap _ (TC (Left x)) = TC (Left x)
   fmap f (TC (Right y)) = TC (Right (f y))
 
@@ -121,12 +120,10 @@ tcinfer (EIf e1 e2 e3) =
     if tcin2 == tcin3
       then return tcin2
       else
-        TC
-          ( Left
-              ( "infer: " ++ "EIf has different type in last two expression:\n" ++ show e2 ++ "has type of" ++ show tcin2 ++ "\n"
-                  ++ show e3
-                  ++ "has type of"
-                  ++ show tcin3
-                  ++ "\n"
-              )
+        tcfail
+          ( "infer: " ++ "EIf has different type in last two expression:\n" ++ show e2 ++ "has type of" ++ show tcin2 ++ "\n"
+              ++ show e3
+              ++ "has type of"
+              ++ show tcin3
+              ++ "\n"
           )
