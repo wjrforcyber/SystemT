@@ -1,6 +1,8 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE GADTs #-}
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE StandaloneDeriving #-}
 
 -- | This is the Syntax of L3.
 module Lang.L3.Syntax.Intrinsic where
@@ -14,33 +16,39 @@ data Ty
   deriving (Eq, Show)
 
 data Exp :: Ty -> * where
-  EZero :: Exp TNat
-  ESucc :: Exp TNat -> Exp TNat
-  ETrue :: Exp TBool
-  EFalse :: Exp TBool
-  EAdd :: Exp TNat -> Exp TNat -> Exp TNat
-  EMul :: Exp TNat -> Exp TNat -> Exp TNat
-  EIf :: Exp TBool -> Exp ty -> Exp ty -> Exp ty
-  deriving (Eq, Show)
+  EZero :: Exp 'TNat
+  ESucc :: Exp 'TNat -> Exp 'TNat
+  ETrue :: Exp 'TBool
+  EFalse :: Exp 'TBool
+  EAdd :: Exp 'TNat -> Exp 'TNat -> Exp 'TNat
+  EMul :: Exp 'TNat -> Exp 'TNat -> Exp 'TNat
+  EIf :: Exp 'TBool -> Exp ty -> Exp ty -> Exp ty
 
-data Val
-  = VSuccN Nat
-  | VTrue
-  | VFalse
-  deriving (Eq, Show)
+deriving instance Eq (Exp ty)
+
+deriving instance Show (Exp ty)
+
+data Val :: Ty -> * where
+  VSuccN :: Nat -> Val 'TNat
+  VTrue :: Val 'TBool
+  VFalse :: Val 'TBool
+
+deriving instance Eq (Val ty)
+
+deriving instance Show (Val ty)
 
 instance Arbitrary Ty where
   arbitrary = oneof [pure TNat, pure TBool]
 
-instance Arbitrary Exp where
+{- instance Arbitrary (Exp ty) where
   arbitrary = sized arbExp
 
-arbExp :: Int -> Gen Exp
+arbExp :: Int -> Gen (Exp ty)
 arbExp 0 =
-  oneof
-    [ pure EZero,
-      pure ETrue,
-      pure EFalse
+  elements
+    [ EZero,
+      ETrue,
+      EFalse
     ]
 arbExp n = do
   (Positive m) <- arbitrary
@@ -51,3 +59,4 @@ arbExp n = do
       EMul <$> subExp <*> subExp,
       EIf <$> subExp <*> subExp <*> subExp
     ]
+ -}
