@@ -1,6 +1,10 @@
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveAnyClass #-}
 -- | This is the Syntax of L1.
 module Lang.L1.Syntax where
 
+import Control.DeepSeq (NFData)
+import GHC.Generics (Generic)
 import Common.Types
 import Prettyprinter ((<+>))
 import qualified Prettyprinter as PP
@@ -15,7 +19,7 @@ data Exp
   = ENat Nat
   | EAdd Exp Exp
   | EMul Exp Exp
-  deriving (Eq, Show)
+  deriving (Eq, Show, Generic, NFData)
 
 -- Parser for Exp
 -- See: http://ozark.hendrix.edu/~yorgey/360/f16/projects/ArithCompiler.html

@@ -1,8 +1,8 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
-module Lang.L3.Typecheck where
+module Lang.L4.Typecheck where
 
-import Lang.L3.Syntax.Extrinsic
+import Lang.L4.Syntax
 import Test.QuickCheck
 
 newtype TcTyExp = TcTyExp {tcgetExp :: Exp}
@@ -10,6 +10,9 @@ newtype TcTyExp = TcTyExp {tcgetExp :: Exp}
 
 newtype TC a = TC {runTC :: Either TCError a}
   deriving (Eq, Show, Functor, Applicative, Monad)
+
+instance MonadFail TC where
+  fail = tcfail
 
 type TCError = String
 
@@ -48,6 +51,24 @@ tccheck (EIf e1 e2 e3) ty =
     _ <- tccheck e2 ty
     _ <- tccheck e3 ty
     return ()
+tccheck EUnit TUnit = return ()
+tccheck (ETuple e1 e2) (TProd ty1 ty2) =
+  do
+    _ <- tccheck e1 ty1
+    _ <- tccheck e2 ty2
+    return ()
+tccheck (EFst e) ty =
+  do
+    TProd ty1 _ <- tcinfer e
+    if ty1 == ty
+      then return ()
+      else tcfail ("check: the type of " ++ show e ++ "is " ++ show ty1 ++ ", not " ++ show ty)
+tccheck (ESnd e) ty =
+  do
+    TProd _ ty2 <- tcinfer e
+    if ty2 == ty
+      then return ()
+      else tcfail ("check: the type of " ++ show e ++ "is " ++ show ty2 ++ ", not " ++ show ty)
 tccheck e ty = tcfail ("check: " ++ show e ++ " is not an expression of type " ++ show ty ++ "!")
 
 --TC infer
@@ -84,3 +105,17 @@ tcinfer (EIf e1 e2 e3) =
               ++ show tcin3
               ++ "\n"
           )
+tcinfer EUnit = return TUnit
+tcinfer (ETuple e1 e2) =
+  do
+    ty1 <- tcinfer e1
+    ty2 <- tcinfer e2
+    return (TProd ty1 ty2)
+tcinfer (EFst e) =
+  do
+    TProd ty1 _ <- tcinfer e
+    return ty1
+tcinfer (ESnd e) =
+  do
+    TProd _ ty2 <- tcinfer e
+    return ty2
