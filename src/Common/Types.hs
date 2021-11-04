@@ -1,11 +1,15 @@
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveAnyClass #-}
 -- | Some useful types.
 module Common.Types where
 
 import Numeric.Natural
 import Prettyprinter
 import Test.QuickCheck
+import GHC.Generics (Generic)
+import Control.DeepSeq (NFData)
 
-data Nat = Zero | Succ Nat deriving (Eq, Ord)
+data Nat = Zero | Succ Nat deriving (Eq, Ord, Generic, NFData)
 
 toNatural :: Nat -> Natural
 toNatural Zero = 0
