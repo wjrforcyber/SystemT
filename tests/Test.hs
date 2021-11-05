@@ -14,7 +14,7 @@ tests :: TestTree
 tests = testGroup "Tests" [unitTests, propertyTests]
 
 unitTests :: TestTree
-unitTests = testGroup "Unit tests" [L1.unitTests, L2.unitTests]
+unitTests = testGroup "Unit tests" [L1.unitTests, L2.unitTests, L4.unitTests]
 
 propertyTests :: TestTree
 propertyTests = testGroup "Property tests" [L1.propertyTests, L2.propertyTests, L3.propertyTests, L4.propertyTests]

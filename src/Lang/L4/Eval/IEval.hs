@@ -28,12 +28,10 @@ eval (EIf e1 e2 e3) =
     VFalse -> eval e3
 eval EUnit = VUnit
 eval (ETuple e1 e2) =
-  case eval e1 of
-    ty1 -> case eval e2 of
-      ty2 -> VTuple ty1 ty2
+  VTuple (eval e1) (eval e2)
 eval (EFst e) =
   case eval e of
-    VTuple (TProd v1 v2) -> v1
+    VTuple v1 _ -> v1
 eval (ESnd e) =
   case eval e of
-    VTuple (TProd v1 v2) -> v2
+    VTuple _ v2 -> v2
