@@ -38,8 +38,10 @@ library
         Lang.L3.Eval.EEval
         Lang.L3.Eval.IEval
         Lang.L3.Typecheck
-        Lang.L4.Syntax
-        Lang.L4.Eval
+        Lang.L4.Syntax.Extrinsic
+        Lang.L4.Syntax.Intrinsic
+        Lang.L4.Eval.EEval
+        Lang.L4.Eval.IEval
         Lang.L4.Typecheck
 
     other-modules:

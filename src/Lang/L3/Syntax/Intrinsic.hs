@@ -25,6 +25,7 @@ data Exp :: Ty -> Type where
   EMul :: Exp 'TNat -> Exp 'TNat -> Exp 'TNat
   EIf :: Exp 'TBool -> Exp ty -> Exp ty -> Exp ty
 
+
 deriving instance Eq (Exp ty)
 
 deriving instance Show (Exp ty)

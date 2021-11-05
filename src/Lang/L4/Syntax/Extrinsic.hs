@@ -1,5 +1,5 @@
 -- | This is the Syntax of L4.
-module Lang.L4.Syntax where
+module Lang.L4.Syntax.Extrinsic where
 
 import Common.Types
 import Test.QuickCheck

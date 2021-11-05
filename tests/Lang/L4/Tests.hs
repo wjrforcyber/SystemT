@@ -1,12 +1,16 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Lang.L4.Tests (propertyTests) where
+module Lang.L4.Tests (unitTests,propertyTests) where
 
 import Data.Maybe
-import Lang.L4.Eval
+import Lang.L4.Eval.EEval as E
+import Lang.L4.Eval.IEval as I
+-- import Lang.L4.Syntax.Extrinsic as E
+import Lang.L4.Syntax.Intrinsic as I
 import Lang.L4.Typecheck
 import Test.Tasty
 import Test.Tasty.QuickCheck as QC
+import Test.Tasty.HUnit
 
 propertyTests :: TestTree
 propertyTests = testGroup "L4 Property tests" [tcL4Props, evalL4Props]
@@ -31,5 +35,16 @@ evalL4Props =
     "eval"
     [ QC.testProperty "1-Well-typed expressions reduced to a value" $
         \(e :: TcTyExp) ->
-          isJust (eval (tcgetExp e))
+          isJust (E.eval (tcgetExp e))
     ]
+
+unitTests :: TestTree
+unitTests = testGroup "L4 Unit tests" [unitL4Tests]
+
+unitL4Tests :: TestTree
+unitL4Tests =
+  testGroup
+    "L4"
+    [ testCase "Unit on L4 0" $
+        I.eval (I.EIf I.ETrue (I.ESucc I.EZero)  (I.ESucc(I.ESucc I.EZero)))  @?= I.VSuccN 1
+  ]
