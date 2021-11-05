@@ -1,7 +1,7 @@
 -- | Evaluator for Extrinsic L4
-module Lang.L4.Eval where
+module Lang.L4.Eval.EEval where
 
-import Lang.L4.Syntax
+import Lang.L4.Syntax.Extrinsic
 
 eval :: Exp -> Maybe Val
 eval EZero = Just (VSuccN 0)

@@ -3,7 +3,8 @@
 module Lang.L4.Tests (propertyTests) where
 
 import Data.Maybe
-import Lang.L4.Eval
+import Lang.L4.Eval.EEval as E
+import Lang.L4.Syntax.Extrinsic
 import Lang.L4.Typecheck
 import Test.Tasty
 import Test.Tasty.QuickCheck as QC
@@ -31,5 +32,5 @@ evalL4Props =
     "eval"
     [ QC.testProperty "1-Well-typed expressions reduced to a value" $
         \(e :: TcTyExp) ->
-          isJust (eval (tcgetExp e))
+          isJust (E.eval (tcgetExp e))
     ]
