@@ -43,6 +43,9 @@ library
         Lang.L4.Eval.EEval
         Lang.L4.Eval.IEval
         Lang.L4.Typecheck
+        Lang.L5.Syntax.Extrinsic
+        Lang.L5.Typecheck
+        Lang.L5.Eval.EEval
 
     other-modules:
     hs-source-dirs:   src
@@ -62,6 +65,7 @@ test-suite test
         Lang.L2.Tests
         Lang.L3.Tests
         Lang.L4.Tests
+        Lang.L5.Tests
     hs-source-dirs: tests
     ghc-options:    -threaded -with-rtsopts=-N
     build-depends:
