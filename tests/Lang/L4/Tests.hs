@@ -1,6 +1,6 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Lang.L4.Tests (unitTests,propertyTests) where
+module Lang.L4.Tests (unitTests, propertyTests) where
 
 import Data.Maybe
 import Lang.L4.Eval.EEval as E
@@ -9,8 +9,8 @@ import Lang.L4.Eval.IEval as I
 import Lang.L4.Syntax.Intrinsic as I
 import Lang.L4.Typecheck
 import Test.Tasty
-import Test.Tasty.QuickCheck as QC
 import Test.Tasty.HUnit
+import Test.Tasty.QuickCheck as QC
 
 propertyTests :: TestTree
 propertyTests = testGroup "L4 Property tests" [tcL4Props, evalL4Props]
@@ -46,5 +46,5 @@ unitL4Tests =
   testGroup
     "L4"
     [ testCase "Unit on L4 0" $
-        I.eval (I.EIf I.ETrue (I.ESucc I.EZero)  (I.ESucc(I.ESucc I.EZero)))  @?= I.VSuccN 1
-  ]
+        I.eval (I.EIf I.ETrue (I.ESucc I.EZero) (I.ESucc (I.ESucc I.EZero))) @?= I.VSuccN 1
+    ]

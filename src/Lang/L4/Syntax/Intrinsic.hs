@@ -9,8 +9,8 @@ module Lang.L4.Syntax.Intrinsic where
 
 import Common.Types
 import Data.Kind (Type)
-import Test.QuickCheck
 import qualified Lang.L4.Syntax.Extrinsic as E
+import Test.QuickCheck
 
 data Ty
   = TNat
@@ -58,6 +58,7 @@ data Val :: Ty -> Type where
   VTuple :: Val ty1 -> Val ty2 -> Val ('TProd ty1 ty2)
 
 deriving instance Eq (Val ty)
+
 deriving instance Show (Val ty)
 
 instance Arbitrary Ty where

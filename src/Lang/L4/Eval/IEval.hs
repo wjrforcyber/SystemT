@@ -4,7 +4,6 @@
 module Lang.L4.Eval.IEval where
 
 import Common.Types
-
 import Lang.L4.Syntax.Intrinsic
 
 eval :: Exp ty -> Val ty
