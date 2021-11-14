@@ -1,5 +1,3 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
-
 module Lang.L6.Typecheck where
 
 import Data.Either
