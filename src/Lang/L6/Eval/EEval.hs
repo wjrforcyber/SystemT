@@ -1,4 +1,4 @@
--- | eval envuator for Extrinsic L5
+-- | eval envuator for Extrinsic L6
 module Lang.L6.Eval.EEval where
 
 import Lang.L6.Syntax.Extrinsic (Exp (..), Name (..), Val (..))
@@ -94,7 +94,7 @@ eval (ERec e1 e2 e3) =
     VSuccN _ <- eval e3
     case e3 of
       EZero -> eval e1
-      ESucc (ESucc e4) -> eval (EApp e2 (ERec e1 e2 e4))
+      ESucc e4 -> eval (EApp e2 (ERec e1 e2 e4))
       _ -> fail "Last expression is not a Nat"
 
 subst :: Name -> Exp -> Exp -> Exp

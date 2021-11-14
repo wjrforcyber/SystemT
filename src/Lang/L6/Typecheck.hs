@@ -193,15 +193,6 @@ tcinfer (EApp e1 e2) =
 tcinfer (ERec e1 e2 e3) =
   do
     ty1 <- tcinfer e1
-    TFun ty2 ty3 <- tcinfer e2
+    _ <- tccheck e2 (TFun ty1 ty1)
     _ <- tccheck e3 TNat
-    if ty1 == ty2 && ty2 == ty3
-      then return ty1
-      else
-        tcfail
-          ( "infer: " ++ "ERec has different type in expression:\n" ++ show e1 ++ "has type of" ++ show ty1 ++ "\n"
-              ++ show e2
-              ++ "has type of"
-              ++ show (TFun ty2 ty3)
-              ++ "\n"
-          )
+    return ty1

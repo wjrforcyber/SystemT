@@ -1,4 +1,4 @@
--- | This is the Syntax of L5.
+-- | This is the Syntax of L6.
 module Lang.L6.Syntax.Extrinsic where
 
 import Common.Types

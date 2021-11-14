@@ -13,10 +13,10 @@ import Test.Tasty.HUnit
 import Test.Tasty.QuickCheck as QC
 
 propertyTests :: TestTree
-propertyTests = testGroup "L6 Property tests" [tcL5Props, evalL5Props]
+propertyTests = testGroup "L6 Property tests" [tcL6Props, evalL6Props]
 
-tcL5Props :: TestTree
-tcL5Props =
+tcL6Props :: TestTree
+tcL6Props =
   testGroup
     "Bidi-typecheck"
     [ QC.testProperty "every well-typed expression can be inferred" $
@@ -29,8 +29,8 @@ tcL5Props =
             Left _ -> error $ "This cannot happen because" ++ show e ++ " is well-typed"
     ]
 
-evalL5Props :: TestTree
-evalL5Props =
+evalL6Props :: TestTree
+evalL6Props =
   testGroup
     "eval"
     [ QC.testProperty "1-Well-typed expressions reduced to a value" $
@@ -39,12 +39,12 @@ evalL5Props =
     ]
 
 unitTests :: TestTree
-unitTests = testGroup "L5 Unit tests" [unitL5Tests]
+unitTests = testGroup "L6 Unit tests" [unitL6Tests]
 
-unitL5Tests :: TestTree
-unitL5Tests =
+unitL6Tests :: TestTree
+unitL6Tests =
   testGroup
-    "L5"
+    "L6"
     [ testCase "Unit on L6 check on Lambda" $
         tcisSuccess (tccheck (ELam (Name "x") TBool (EIf (EVar (Name "x")) (ESucc EZero) EZero)) (TFun TBool TNat)) @?= True,
       testCase "Unit on L6 infer on Lambda" $
