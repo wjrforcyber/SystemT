@@ -19,6 +19,7 @@ fromNatural :: Natural -> Nat
 fromNatural 0 = Zero
 fromNatural n = Succ (fromNatural (pred n))
 
+
 instance Show Nat where
   showsPrec p = showsPrec p . toNatural
 

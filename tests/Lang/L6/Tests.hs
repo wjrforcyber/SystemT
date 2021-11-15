@@ -50,5 +50,11 @@ unitL6Tests =
       testCase "Unit on L6 infer on Lambda" $
         runTC (tcinfer (ELam (Name "x") TBool (EIf (EVar (Name "x")) (ESucc EZero) EZero))) E.Emp @?= Right (TFun TBool TNat),
       testCase "Unit on L6 1" $
-        EE.runEval (EE.eval (EApp (ELam (Name "x") TBool (EIf (EVar (Name "x")) (ESucc EZero) EZero)) ETrue)) EE.Emp @?= Just (VSuccN 1)
+        EE.runEval (EE.eval (EApp (ELam (Name "x") TBool (EIf (EVar (Name "x")) (ESucc EZero) EZero)) ETrue)) EE.Emp @?= Just (VSuccN 1),
+      testCase "Unit on L6 2" $
+        EE.runEval (EE.eval
+        (ERec (ESucc EZero)
+        (ELam (Name "x") TBool
+        (EApp (ELam (Name "x") TBool (ESucc EZero)) ETrue)
+        ) (EApp (ELam (Name "x") TBool (EIf (EVar (Name "x")) (ESucc EZero) EZero)) ETrue))) EE.Emp @?= Just (VSuccN 1)
     ]

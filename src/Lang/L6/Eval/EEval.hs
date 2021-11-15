@@ -3,6 +3,8 @@ module Lang.L6.Eval.EEval where
 
 import Lang.L6.Syntax.Extrinsic (Exp (..), Name (..), Val (..))
 
+import Common.Types
+
 data Env
   = Emp
   | Snoc Env (Name, Val)
@@ -38,6 +40,10 @@ instance MonadFail Eval where
 
 readEnv :: Eval Env
 readEnv = Eval pure
+
+natToExp :: Nat -> Exp
+natToExp Zero = EZero
+natToExp (Succ n) = ESucc(natToExp n)
 
 eval :: Exp -> Eval Val
 eval EZero = return $ VSuccN 0
@@ -89,13 +95,13 @@ eval (EApp e1 e2) =
   do
     VLam name _ e <- eval e1
     eval $ subst name e2 e
+
 eval (ERec e1 e2 e3) =
   do
-    VSuccN _ <- eval e3
-    case e3 of
-      EZero -> eval e1
-      ESucc e4 -> eval (EApp e2 (ERec e1 e2 e4))
-      _ -> fail "Last expression is not a Nat"
+    VSuccN n <- eval e3
+    case n of
+      Zero -> eval e1
+      Succ e4 -> eval (EApp e2 (ERec e1 e2 (natToExp e4)))
 
 subst :: Name -> Exp -> Exp -> Exp
 subst x e (EVar y)
