@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wno-typed-holes #-}
+
 -- | This is the Syntax of L5.
 module Lang.L5.Syntax.Extrinsic where
 
@@ -74,29 +76,70 @@ instance Arbitrary Exp where
 instance Arbitrary Name where
   arbitrary = Name <$> elements (map (: []) ['a' .. 'z'])
 
-arbExp :: Int -> Gen Exp
-arbExp 0 =
+arbName :: Name -> Ctx -> Gen Name
+arbName x Emp = pure x
+arbName x (Snoc ctx' (y, _)) =
   oneof
-    [ pure EZero,
-      pure ETrue,
-      pure EFalse,
-      pure EUnit
+    [ pure x,
+      arbName y ctx'
     ]
-arbExp n = do
+
+arbExpCtx :: Int -> Ctx -> Gen Exp
+arbExpCtx 0 ctx =
+  case ctx of
+    Emp ->
+      elements
+        [ EZero,
+          ETrue,
+          EFalse,
+          EUnit
+        ]
+    Snoc ctx' (x, _) ->
+      oneof
+        [ pure EZero,
+          pure ETrue,
+          pure EFalse,
+          pure EUnit,
+          EVar <$> arbName x ctx'
+        ]
+arbExpCtx n ctx = do
   (Positive m) <- arbitrary
-  let subExp = arbExp (n `div` (m + 1))
-  oneof
-    [ ESucc <$> subExp,
-      EAdd <$> subExp <*> subExp,
-      EMul <$> subExp <*> subExp,
-      EIf <$> subExp <*> subExp <*> subExp,
-      ETuple <$> subExp <*> subExp,
-      EFst <$> subExp,
-      ESnd <$> subExp,
-      EVar <$> arbitrary,
-      ELam <$> arbitrary <*> arbitrary <*> subExp,
-      EApp <$> subExp <*> subExp
-    ]
+  let subExp = arbExpCtx (n `div` (m + 1)) ctx
+  case ctx of
+    Emp ->
+      oneof
+        [ ESucc <$> subExp,
+          EAdd <$> subExp <*> subExp,
+          EMul <$> subExp <*> subExp,
+          EIf <$> subExp <*> subExp <*> subExp,
+          ETuple <$> subExp <*> subExp,
+          EFst <$> subExp,
+          ESnd <$> subExp,
+          do
+            x <- arbitrary
+            ty <- arbitrary
+            ELam x ty <$> arbExpCtx (n `div` (m + 1)) (Snoc ctx (x, ty)),
+          EApp <$> subExp <*> subExp
+        ]
+    Snoc ctx' (y, _) ->
+      oneof
+        [ ESucc <$> subExp,
+          EAdd <$> subExp <*> subExp,
+          EMul <$> subExp <*> subExp,
+          EIf <$> subExp <*> subExp <*> subExp,
+          ETuple <$> subExp <*> subExp,
+          EFst <$> subExp,
+          ESnd <$> subExp,
+          EVar <$> arbName y ctx',
+          do
+            x <- arbitrary
+            ty <- arbitrary
+            ELam x ty <$> arbExpCtx (n `div` m + 1) (Snoc ctx (x, ty)),
+          EApp <$> subExp <*> subExp
+        ]
+
+arbExp :: Int -> Gen Exp
+arbExp n = arbExpCtx n Emp
 
 instance PP.Pretty Ty where
   pretty = prettyTy
@@ -106,8 +149,8 @@ instance Show Ty where
 
 prettyTy :: Ty -> PP.Doc ann
 prettyTy TNat = PP.pretty "ℕ"
-prettyTy TBool = PP.pretty "𝔹"
-prettyTy TUnit = PP.pretty "𝕌"
+prettyTy TBool = PP.pretty "𝟐"
+prettyTy TUnit = PP.pretty "𝟏"
 prettyTy (TProd ty1 ty2) = PP.pretty "(" <+> prettyTy ty1 <+> PP.pretty "×" <+> prettyTy ty2 <+> PP.pretty ")"
 prettyTy (TFun ty1 ty2) = PP.pretty "(" <+> prettyTy ty1 <+> PP.pretty "→" <+> prettyTy ty2 <+> PP.pretty ")"
 

@@ -1,13 +1,11 @@
 -- | eval envuator for Extrinsic L6
 module Lang.L6.Eval.EEval where
 
-import Lang.L6.Syntax.Extrinsic (Exp (..), Name (..), Val (..))
-
-import Common.Types
+import Lang.L6.Syntax.Extrinsic (Exp (..), Name (..))
 
 data Env
   = Emp
-  | Snoc Env (Name, Val)
+  | Snoc Env (Name, Exp)
 
 newtype Eval a = Eval {runEval :: Env -> Maybe a}
 
@@ -26,14 +24,14 @@ instance Monad Eval where
     x' <- x ctx
     runEval (f x') ctx
 
-lookupEnv :: Name -> Env -> Maybe Val
-lookupEnv _ Emp = Nothing
-lookupEnv x (Snoc env (y, v))
-  | x == y = Just v
-  | otherwise = lookupEnv x env
+-- lookupEnv :: Name -> Env -> Maybe Val
+-- lookupEnv _ Emp = Nothing
+-- lookupEnv x (Snoc env (y, v))
+--   | x == y = Just v
+--   | otherwise = lookupEnv x env
 
-extendEnv :: Env -> Name -> Val -> Env
-extendEnv env x v = Snoc env (x, v)
+-- extendEnv :: Env -> Name -> Val -> Env
+-- extendEnv env x v = Snoc env (x, v)
 
 instance MonadFail Eval where
   fail _ = Eval $ const Nothing
@@ -41,67 +39,69 @@ instance MonadFail Eval where
 readEnv :: Eval Env
 readEnv = Eval pure
 
-natToExp :: Nat -> Exp
-natToExp Zero = EZero
-natToExp (Succ n) = ESucc(natToExp n)
+-- natToExp :: Nat -> Exp
+-- natToExp Zero = EZero
+-- natToExp (Succ n) = ESucc(natToExp n)
 
-eval :: Exp -> Eval Val
-eval EZero = return $ VSuccN 0
-eval (ESucc e) =
-  do
-    VSuccN n <- eval e
-    return $ VSuccN (1 + n)
-eval ETrue = return VTrue
-eval EFalse = return VFalse
-eval (EAdd e1 e2) =
-  do
-    VSuccN n <- eval e1
-    VSuccN m <- eval e2
-    return $ VSuccN (n + m)
-eval (EMul e1 e2) =
-  do
-    VSuccN n <- eval e1
-    VSuccN m <- eval e2
-    return $ VSuccN (n * m)
-eval (EIf e1 e2 e3) =
-  do
-    b1 <- eval e1
-    if b1 == VTrue
-      then eval e2
-      else eval e3
-eval EUnit = return VUnit
-eval (ETuple e1 e2) =
-  do
-    n <- eval e1
-    m <- eval e2
-    return $ VTuple n m
-eval (EFst e) =
-  do
-    VTuple v1 _ <- eval e
-    return v1
-eval (ESnd e) =
-  do
-    VTuple _ v2 <- eval e
-    return v2
-eval (EVar name) =
-  do
-    env <- readEnv
-    case lookupEnv name env of
-      Just v -> return v
-      Nothing -> fail "unbound variable"
-eval (ELam name ty e) =
-  return $ VLam name ty e
-eval (EApp e1 e2) =
-  do
-    VLam name _ e <- eval e1
-    eval $ subst name e2 e
+-- eval :: Exp -> Eval Val
+-- eval EZero = return $ VSuccN 0
+-- eval (ESucc e) =
+--   do
+--     VSuccN n <- eval e
+--     return $ VSuccN (1 + n)
+-- eval ETrue = return VTrue
+-- eval EFalse = return VFalse
+-- eval (EAdd e1 e2) =
+--   do
+--     VSuccN n <- eval e1
+--     VSuccN m <- eval e2
+--     return $ VSuccN (n + m)
+-- eval (EMul e1 e2) =
+--   do
+--     VSuccN n <- eval e1
+--     VSuccN m <- eval e2
+--     return $ VSuccN (n * m)
+-- eval (EIf e1 e2 e3) =
+--   do
+--     b1 <- eval e1
+--     case b1 of
+--       VTrue -> eval e2
+--       VFalse -> eval e3
+--       _ -> fail (show e1 ++ "has a type of" ++ show b1)
 
-eval (ERec e1 e2 e3) =
-  do
-    VSuccN n <- eval e3
-    case n of
-      Zero -> eval e1
-      Succ e4 -> eval (EApp e2 (ERec e1 e2 (natToExp e4)))
+-- eval EUnit = return VUnit
+-- eval (ETuple e1 e2) =
+--   do
+--     n <- eval e1
+--     m <- eval e2
+--     return $ VTuple n m
+-- eval (EFst e) =
+--   do
+--     VTuple v1 _ <- eval e
+--     return v1
+-- eval (ESnd e) =
+--   do
+--     VTuple _ v2 <- eval e
+--     return v2
+-- eval (EVar name) =
+--   do
+--     env <- readEnv
+--     case lookupEnv name env of
+--       Just v -> return v
+--       Nothing -> fail "unbound variable"
+-- eval (ELam name ty e) =
+--   return $ VLam name ty e
+-- eval (EApp e1 e2) =
+--   do
+--     VLam name _ e <- eval e1
+--     eval $ subst name e2 e
+
+-- eval (ERec e1 e2 e3) =
+--   do
+--     VSuccN n <- eval e3
+--     case n of
+--       Zero -> eval e1
+--       Succ e4 -> eval (EApp e2 (ERec e1 e2 (natToExp e4)))
 
 subst :: Name -> Exp -> Exp -> Exp
 subst x e (EVar y)
@@ -115,8 +115,52 @@ subst x e (ETuple e1 e2) = ETuple (subst x e e1) (subst x e e2)
 subst x e (EFst e') = EFst (subst x e e')
 subst x e (ESnd e') = ESnd (subst x e e')
 subst x e (EIf e1 e2 e3) = EIf (subst x e e1) (subst x e e2) (subst x e e3)
-subst x e (EAdd e1 e2) = EAdd (subst x e e1) (subst x e e2)
-subst x e (EMul e1 e2) = EMul (subst x e e1) (subst x e e2)
 subst x e (ESucc e') = ESucc (subst x e e')
 subst x e (ERec e1 e2 e3) = ERec (subst x e e1) (subst x e e2) (subst x e e3)
 subst _ _ e = e
+
+evalStep :: Exp -> Maybe Exp
+-- computation rules
+-- boolean
+evalStep (EIf ETrue e2 _) =
+  evalStep e2
+evalStep (EIf EFalse _ e3) =
+  evalStep e3
+-- products
+evalStep (EFst (ETuple e1 _)) =
+  evalStep e1
+evalStep (ESnd (ETuple _ e2)) =
+  evalStep e2
+-- functions
+evalStep (EApp (ELam x _ e1) e2) =
+  evalStep (subst x e2 e1)
+-- naturals
+evalStep (ERec e1 _ EZero) =
+  evalStep e1
+evalStep (ERec e1 e2 (ESucc e3)) =
+  evalStep $ EApp e2 (ERec e1 e2 e3)
+-- congruence rules
+-- products
+evalStep (ETuple e1 e2)
+  | isVal e1 = ETuple <$> pure e1 <*> evalStep e2
+  | otherwise = ETuple <$> evalStep e1 <*> pure e2
+-- naturals
+evalStep (ESucc e)
+  | isVal e = ESucc <$> pure e
+  | otherwise = ESucc <$> evalStep e
+evalStep _ =
+  Nothing
+
+isVal :: Exp -> Bool
+isVal EZero = True
+isVal (ESucc e) = isVal e
+isVal ETrue = True
+isVal EFalse = True
+isVal EUnit = True
+isVal (ETuple e1 e2) = isVal e1 && isVal e2
+isVal ELam {} = True
+isVal _ = False
+
+eval :: Exp -> Exp
+eval e =
+  maybe e eval (evalStep e)

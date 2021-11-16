@@ -1,7 +1,6 @@
 -- | This is the Syntax of L6.
 module Lang.L6.Syntax.Extrinsic where
 
-import Common.Types
 import Prettyprinter ((<+>))
 import qualified Prettyprinter as PP
 import Prettyprinter.Render.String
@@ -37,8 +36,6 @@ data Exp
   | ESucc Exp
   | ETrue
   | EFalse
-  | EAdd Exp Exp
-  | EMul Exp Exp
   | EIf Exp Exp Exp
   | EUnit
   | ETuple Exp Exp
@@ -49,15 +46,6 @@ data Exp
   | EApp Exp Exp --application
   | ERec Exp Exp Exp
   deriving (Eq)
-
-data Val
-  = VSuccN Nat
-  | VTrue
-  | VFalse
-  | VUnit
-  | VTuple Val Val
-  | VLam Name Ty Exp
-  deriving (Eq, Show)
 
 instance Arbitrary Ty where
   arbitrary =
@@ -75,30 +63,66 @@ instance Arbitrary Exp where
 instance Arbitrary Name where
   arbitrary = Name <$> elements (map (: []) ['a' .. 'z'])
 
-arbExp :: Int -> Gen Exp
-arbExp 0 =
+arbName :: Name -> Ctx -> Gen Name
+arbName x Emp = pure x
+arbName x (Snoc ctx' (y, _)) =
   oneof
-    [ pure EZero,
-      pure ETrue,
-      pure EFalse,
-      pure EUnit
+    [ pure x,
+      arbName y ctx'
     ]
-arbExp n = do
+
+arbExpCtx :: Int -> Ctx -> Gen Exp
+arbExpCtx 0 ctx =
+  case ctx of
+    Emp ->
+      elements
+        [ EZero,
+          ETrue,
+          EFalse,
+          EUnit
+        ]
+    Snoc ctx' (x, _) ->
+      oneof
+        [ pure EZero,
+          pure ETrue,
+          pure EFalse,
+          pure EUnit,
+          EVar <$> arbName x ctx'
+        ]
+arbExpCtx n ctx = do
   (Positive m) <- arbitrary
-  let subExp = arbExp (n `div` (m + 1))
-  oneof
-    [ ESucc <$> subExp,
-      EAdd <$> subExp <*> subExp,
-      EMul <$> subExp <*> subExp,
-      EIf <$> subExp <*> subExp <*> subExp,
-      ETuple <$> subExp <*> subExp,
-      EFst <$> subExp,
-      ESnd <$> subExp,
-      EVar <$> arbitrary,
-      ELam <$> arbitrary <*> arbitrary <*> subExp,
-      EApp <$> subExp <*> subExp,
-      ERec <$> subExp <*> subExp <*> subExp
-    ]
+  let subExp = arbExpCtx (n `div` (m + 1)) ctx
+  case ctx of
+    Emp ->
+      oneof
+        [ ESucc <$> subExp,
+          EIf <$> subExp <*> subExp <*> subExp,
+          ETuple <$> subExp <*> subExp,
+          EFst <$> subExp,
+          ESnd <$> subExp,
+          do
+            x <- arbitrary
+            ty <- arbitrary
+            ELam x ty <$> arbExpCtx (n `div` (m + 1)) (Snoc ctx (x, ty)),
+          EApp <$> subExp <*> subExp
+        ]
+    Snoc ctx' (y, _) ->
+      oneof
+        [ ESucc <$> subExp,
+          EIf <$> subExp <*> subExp <*> subExp,
+          ETuple <$> subExp <*> subExp,
+          EFst <$> subExp,
+          ESnd <$> subExp,
+          EVar <$> arbName y ctx',
+          do
+            x <- arbitrary
+            ty <- arbitrary
+            ELam x ty <$> arbExpCtx (n `div` m + 1) (Snoc ctx (x, ty)),
+          EApp <$> subExp <*> subExp
+        ]
+
+arbExp :: Int -> Gen Exp
+arbExp n = arbExpCtx n Emp
 
 instance PP.Pretty Ty where
   pretty = prettyTy
@@ -127,8 +151,6 @@ prettyExp EZero = PP.pretty "0"
 prettyExp (ESucc e) = PP.pretty "S" <+> PP.pretty "(" <+> prettyExp e <+> PP.pretty ")"
 prettyExp ETrue = PP.pretty "true"
 prettyExp EFalse = PP.pretty "false"
-prettyExp (EAdd e1 e2) = PP.pretty "(" <+> prettyExp e1 <+> PP.pretty "+" <+> prettyExp e2 <+> PP.pretty ")"
-prettyExp (EMul e1 e2) = PP.pretty "(" <+> prettyExp e1 <+> PP.pretty "*" <+> prettyExp e2 <+> PP.pretty ")"
 prettyExp (EIf e1 e2 e3) = PP.pretty "if" <+> prettyExp e1 <+> PP.pretty "then" <+> prettyExp e2 <+> PP.pretty "else" <+> prettyExp e3
 prettyExp EUnit = PP.pretty "()"
 prettyExp (ETuple e1 e2) = PP.pretty "(" <+> prettyExp e1 <+> PP.pretty "," <+> prettyExp e2 <+> PP.pretty ")"

@@ -71,16 +71,6 @@ tccheck (ESucc e) TNat =
     return ()
 tccheck ETrue TBool = return ()
 tccheck EFalse TBool = return ()
-tccheck (EAdd e1 e2) TNat =
-  do
-    _ <- tccheck e1 TNat
-    _ <- tccheck e2 TNat
-    return ()
-tccheck (EMul e1 e2) TNat =
-  do
-    _ <- tccheck e1 TNat
-    _ <- tccheck e2 TNat
-    return ()
 tccheck (EIf e1 e2 e3) ty =
   do
     _ <- tccheck e1 TBool
@@ -139,16 +129,7 @@ tcinfer (ESucc e) =
     return TNat
 tcinfer ETrue = return TBool
 tcinfer EFalse = return TBool
-tcinfer (EAdd e1 e2) =
-  do
-    _ <- tccheck e1 TNat
-    _ <- tccheck e2 TNat
-    return TNat
-tcinfer (EMul e1 e2) =
-  do
-    _ <- tccheck e1 TNat
-    _ <- tccheck e2 TNat
-    return TNat
+
 tcinfer (EIf e1 e2 e3) =
   do
     _ <- tccheck e1 TBool

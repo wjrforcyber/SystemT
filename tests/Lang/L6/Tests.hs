@@ -2,7 +2,6 @@
 
 module Lang.L6.Tests (unitTests, propertyTests) where
 
-import Data.Maybe
 import Lang.L6.Eval.EEval as EE
 -- import Lang.L5.Eval.IEval as I
 import Lang.L6.Syntax.Extrinsic as E
@@ -33,9 +32,16 @@ evalL6Props :: TestTree
 evalL6Props =
   testGroup
     "eval"
-    [ QC.testProperty "1-Well-typed expressions reduced to a value" $
-        \(e :: TcTyExp) ->
-          isJust $ EE.runEval (EE.eval (tcgetExp e)) EE.Emp
+    [ QC.testProperty "1. Progress: Well-typed expressions always reduce to a value" $
+        QC.within 10000000 $
+          \(e :: TcTyExp) ->
+            EE.isVal (EE.eval (tcgetExp e)),
+      QC.testProperty "2. Type-preservation: Well-typed expressions reduce to a value of the same type" $
+        QC.within 10000000 $
+          \(e :: TcTyExp) ->
+            case runTC (tcinfer (tcgetExp e)) E.Emp of
+              Right ty -> tcisSuccess $ tccheck (EE.eval (tcgetExp e)) ty
+              Left _ -> error $ "This cannot happen because" ++ show e ++ " is well-typed"
     ]
 
 unitTests :: TestTree
@@ -48,13 +54,13 @@ unitL6Tests =
     [ testCase "Unit on L6 check on Lambda" $
         tcisSuccess (tccheck (ELam (Name "x") TBool (EIf (EVar (Name "x")) (ESucc EZero) EZero)) (TFun TBool TNat)) @?= True,
       testCase "Unit on L6 infer on Lambda" $
-        runTC (tcinfer (ELam (Name "x") TBool (EIf (EVar (Name "x")) (ESucc EZero) EZero))) E.Emp @?= Right (TFun TBool TNat),
-      testCase "Unit on L6 1" $
-        EE.runEval (EE.eval (EApp (ELam (Name "x") TBool (EIf (EVar (Name "x")) (ESucc EZero) EZero)) ETrue)) EE.Emp @?= Just (VSuccN 1),
-      testCase "Unit on L6 2" $
-        EE.runEval (EE.eval
-        (ERec (ESucc EZero)
-        (ELam (Name "x") TBool
-        (EApp (ELam (Name "x") TBool (ESucc EZero)) ETrue)
-        ) (EApp (ELam (Name "x") TBool (EIf (EVar (Name "x")) (ESucc EZero) EZero)) ETrue))) EE.Emp @?= Just (VSuccN 1)
+        runTC (tcinfer (ELam (Name "x") TBool (EIf (EVar (Name "x")) (ESucc EZero) EZero))) E.Emp @?= Right (TFun TBool TNat)
+        {- testCase "Unit on L6 1" $
+          EE.runEval (EE.eval (EApp (ELam (Name "x") TBool (EIf (EVar (Name "x")) (ESucc EZero) EZero)) ETrue)) EE.Emp @?= Just (VSuccN 1),
+        testCase "Unit on L6 2" $
+          EE.runEval (EE.eval
+          (ERec (ESucc EZero)
+          (ELam (Name "x") TBool
+          (EApp (ELam (Name "x") TBool (ESucc EZero)) ETrue))
+          (EApp (ELam (Name "x") TBool (EIf (EVar (Name "x")) (ESucc EZero) EZero)) ETrue))) EE.Emp @?= Just (VSuccN 1) -}
     ]
