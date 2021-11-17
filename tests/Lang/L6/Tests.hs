@@ -33,11 +33,11 @@ evalL6Props =
   testGroup
     "eval"
     [ QC.testProperty "1. Progress: Well-typed expressions always reduce to a value" $
-        QC.within 10000000 $
+        QC.within 5000000 $
           \(e :: TcTyExp) ->
             EE.isVal (EE.eval (tcgetExp e)),
       QC.testProperty "2. Type-preservation: Well-typed expressions reduce to a value of the same type" $
-        QC.within 10000000 $
+        QC.within 5000000 $
           \(e :: TcTyExp) ->
             case runTC (tcinfer (tcgetExp e)) E.Emp of
               Right ty -> tcisSuccess $ tccheck (EE.eval (tcgetExp e)) ty

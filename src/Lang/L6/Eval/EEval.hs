@@ -123,31 +123,39 @@ evalStep :: Exp -> Maybe Exp
 -- computation rules
 -- boolean
 evalStep (EIf ETrue e2 _) =
-  evalStep e2
+  pure e2
 evalStep (EIf EFalse _ e3) =
-  evalStep e3
+  pure e3
 -- products
 evalStep (EFst (ETuple e1 _)) =
-  evalStep e1
+  pure e1
 evalStep (ESnd (ETuple _ e2)) =
-  evalStep e2
+  pure e2
 -- functions
 evalStep (EApp (ELam x _ e1) e2) =
-  evalStep (subst x e2 e1)
+  pure (subst x e2 e1)
 -- naturals
 evalStep (ERec e1 _ EZero) =
-  evalStep e1
+  pure e1
 evalStep (ERec e1 e2 (ESucc e3)) =
-  evalStep $ EApp e2 (ERec e1 e2 e3)
+  pure $ EApp e2 (ERec e1 e2 e3)
 -- congruence rules
+-- booleans
+evalStep (EIf e1 e2 e3) =
+  EIf <$> evalStep e1 <*> pure e2 <*> pure e3
 -- products
 evalStep (ETuple e1 e2)
+  | isVal e1 && isVal e2 = Nothing
   | isVal e1 = ETuple <$> pure e1 <*> evalStep e2
   | otherwise = ETuple <$> evalStep e1 <*> pure e2
+-- functions
+--
 -- naturals
 evalStep (ESucc e)
-  | isVal e = ESucc <$> pure e
+  | isVal e = Nothing
   | otherwise = ESucc <$> evalStep e
+evalStep (ERec e1 e2 e3) =
+  ERec <$> pure e1 <*> pure e2 <*> evalStep e3
 evalStep _ =
   Nothing
 
