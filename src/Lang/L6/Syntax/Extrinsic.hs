@@ -117,7 +117,7 @@ arbExpCtx n ctx = do
           do
             x <- arbitrary
             ty <- arbitrary
-            ELam x ty <$> arbExpCtx (n `div` m + 1) (Snoc ctx (x, ty)),
+            ELam x ty <$> arbExpCtx (n `div` (m + 1)) (Snoc ctx (x, ty)),
           EApp <$> subExp <*> subExp
         ]
 

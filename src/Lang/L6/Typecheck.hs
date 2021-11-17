@@ -129,7 +129,6 @@ tcinfer (ESucc e) =
     return TNat
 tcinfer ETrue = return TBool
 tcinfer EFalse = return TBool
-
 tcinfer (EIf e1 e2 e3) =
   do
     _ <- tccheck e1 TBool
