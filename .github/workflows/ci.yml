@@ -6,6 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Build and test Haskell project
     strategy:
+      fail-fast: false
       matrix:
         cabal: ["latest"]
         ghc: ["latest", "9.0", "8.10", "8.8"]
@@ -40,4 +41,6 @@ jobs:
           path: '["src/", "tests/"]'
           fail-on: error
 
-      - run: cabal v2-test
+      - run: cabal v2-run test -- +RTS -N -RTS
+        env:
+          TASTY_QUICKCHECK_TESTS: 1_000_000
