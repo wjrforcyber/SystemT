@@ -1,3 +1,4 @@
+{-# LANGUAGE NumericUnderscores #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
@@ -37,15 +38,17 @@ evalL6Props =
   testGroup
     "eval"
     [ QC.testProperty "1. Progress: Well-typed expressions always reduce to a value" $
-        QC.within 5000000 $
-          \(e :: TcTyExp) ->
-            EE.isVal (EE.eval (tcgetExp e)),
+        QC.withMaxSuccess 1_000_000 $ -- test 1 million times
+          QC.within 5000000 $ -- timeout after 5s
+            \(e :: TcTyExp) ->
+              EE.isVal (EE.eval (tcgetExp e)),
       QC.testProperty "2. Type-preservation: Well-typed expressions reduce to a value of the same type" $
-        QC.within 5000000 $
-          \(e :: TcTyExp) ->
-            case runTC (tcinfer (tcgetExp e)) E.Emp of
-              Right ty -> tcisSuccess $ tccheck (EE.eval (tcgetExp e)) ty
-              Left _ -> error $ "This cannot happen because" ++ show e ++ " is well-typed"
+        QC.withMaxSuccess 1_000_000 $ -- test 1 million times
+          QC.within 5000000 $ -- timeout after 5s
+            \(e :: TcTyExp) ->
+              case runTC (tcinfer (tcgetExp e)) E.Emp of
+                Right ty -> tcisSuccess $ tccheck (EE.eval (tcgetExp e)) ty
+                Left _ -> error $ "This cannot happen because" ++ show e ++ " is well-typed"
     ]
 
 unitTests :: TestTree
