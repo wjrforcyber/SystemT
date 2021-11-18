@@ -1,11 +1,12 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+
 -- | This is the Syntax of L6.
 module Lang.L6.Syntax.Extrinsic where
 
+import Data.String
 import Prettyprinter ((<+>))
 import qualified Prettyprinter as PP
 import Prettyprinter.Render.String
-import Data.String
 import Test.QuickCheck
 
 data Ty
@@ -135,7 +136,7 @@ prettyExp (ESucc e) = PP.pretty "S" <> PP.pretty "(" <> prettyExp e <> PP.pretty
 prettyExp ETrue = PP.pretty "true"
 prettyExp EFalse = PP.pretty "false"
 prettyExp (EIf e1 e2 e3) = PP.pretty "if" <+> PP.pretty "(" <> prettyExp e1 <> PP.pretty ")" <+> PP.pretty "then" <+> PP.pretty "(" <> prettyExp e2 <> PP.pretty ")" <+> PP.pretty "else" <+> PP.pretty "(" <> prettyExp e3 <> PP.pretty ")"
-prettyExp EUnit = PP.pretty "()"
+prettyExp EUnit = PP.pretty "∗"
 prettyExp (ETuple e1 e2) = PP.pretty "(" <> prettyExp e1 <> PP.pretty "," <+> prettyExp e2 <> PP.pretty ")"
 prettyExp (EFst e) = PP.pretty "fst" <> PP.pretty "(" <> prettyExp e <> PP.pretty ")"
 prettyExp (ESnd e) = PP.pretty "snd" <> PP.pretty "(" <> prettyExp e <> PP.pretty ")"

@@ -91,4 +91,4 @@ exampleTest Program {..} =
 
 exampleTests :: TestTree
 exampleTests =
-  testGroup "L6" $ map exampleTest [predProg]
+  testGroup "L6" $ map exampleTest [isZeroProg, predProg]

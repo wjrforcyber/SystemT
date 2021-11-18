@@ -51,6 +51,7 @@ library
         Lang.L6.Typecheck
         Lang.L6.Examples
         Lang.L6.Examples.Base
+        Lang.L6.Examples.IsZero
         Lang.L6.Examples.Pred
 
     other-modules:
