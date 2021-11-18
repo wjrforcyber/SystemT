@@ -1,11 +1,15 @@
+{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Lang.L6.Tests (unitTests, propertyTests) where
+module Lang.L6.Tests (unitTests, propertyTests, exampleTests) where
 
 import Lang.L6.Eval.EEval as EE
 -- import Lang.L5.Eval.IEval as I
-import Lang.L6.Syntax.Extrinsic as E
+
 -- import Lang.L5.Syntax.Intrinsic as I
+
+import Lang.L6.Examples
+import Lang.L6.Syntax.Extrinsic as E
 import Lang.L6.Typecheck
 import Test.Tasty
 import Test.Tasty.HUnit
@@ -64,3 +68,18 @@ unitL6Tests =
           (EApp (ELam (Name "x") TBool (ESucc EZero)) ETrue))
           (EApp (ELam (Name "x") TBool (EIf (EVar (Name "x")) (ESucc EZero) EZero)) ETrue))) EE.Emp @?= Just (VSuccN 1) -}
     ]
+
+exampleTest :: Program -> TestTree
+exampleTest Program {..} =
+  testGroup
+    progName
+    [ testCase ("has type " ++ show progTy) $
+        tcisSuccess (tccheck progExp progTy) @?= True,
+      QC.testProperty
+        "evaluates correctly"
+        progProp
+    ]
+
+exampleTests :: TestTree
+exampleTests =
+  testGroup "L6" $ map exampleTest [predProg]

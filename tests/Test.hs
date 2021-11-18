@@ -13,10 +13,13 @@ main :: IO ()
 main = defaultMain tests
 
 tests :: TestTree
-tests = testGroup "Tests" [unitTests, propertyTests]
+tests = testGroup "Tests" [unitTests, propertyTests, exampleTests]
 
 unitTests :: TestTree
 unitTests = testGroup "Unit tests" [L1.unitTests, L2.unitTests, L4.unitTests, L5.unitTests, L6.unitTests]
 
 propertyTests :: TestTree
 propertyTests = testGroup "Property tests" [L1.propertyTests, L2.propertyTests, L3.propertyTests, L4.propertyTests, L5.propertyTests, L6.propertyTests]
+
+exampleTests :: TestTree
+exampleTests = testGroup "Example tests" [L6.exampleTests]
