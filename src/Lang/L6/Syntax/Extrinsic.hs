@@ -73,53 +73,34 @@ arbName x (Snoc ctx' (y, _)) =
 
 arbExpCtx :: Int -> Ctx -> Gen Exp
 arbExpCtx 0 ctx =
-  case ctx of
-    Emp ->
-      elements
-        [ EZero,
-          ETrue,
-          EFalse,
-          EUnit
-        ]
-    Snoc ctx' (x, _) ->
-      oneof
-        [ pure EZero,
-          pure ETrue,
-          pure EFalse,
-          pure EUnit,
-          EVar <$> arbName x ctx'
-        ]
+  oneof $
+    [ pure EZero,
+      pure ETrue,
+      pure EFalse,
+      pure EUnit
+    ]
+      ++ case ctx of
+        Emp -> []
+        Snoc ctx' (x, _) -> [EVar <$> arbName x ctx']
 arbExpCtx n ctx = do
   (Positive m) <- arbitrary
   let subExp = arbExpCtx (n `div` (m + 1)) ctx
-  case ctx of
-    Emp ->
-      oneof
-        [ ESucc <$> subExp,
-          EIf <$> subExp <*> subExp <*> subExp,
-          ETuple <$> subExp <*> subExp,
-          EFst <$> subExp,
-          ESnd <$> subExp,
-          do
-            x <- arbitrary
-            ty <- arbitrary
-            ELam x ty <$> arbExpCtx (n `div` (m + 1)) (Snoc ctx (x, ty)),
-          EApp <$> subExp <*> subExp
-        ]
-    Snoc ctx' (y, _) ->
-      oneof
-        [ ESucc <$> subExp,
-          EIf <$> subExp <*> subExp <*> subExp,
-          ETuple <$> subExp <*> subExp,
-          EFst <$> subExp,
-          ESnd <$> subExp,
-          EVar <$> arbName y ctx',
-          do
-            x <- arbitrary
-            ty <- arbitrary
-            ELam x ty <$> arbExpCtx (n `div` (m + 1)) (Snoc ctx (x, ty)),
-          EApp <$> subExp <*> subExp
-        ]
+  oneof $
+    [ ESucc <$> subExp,
+      ERec <$> subExp <*> subExp <*> subExp,
+      EIf <$> subExp <*> subExp <*> subExp,
+      ETuple <$> subExp <*> subExp,
+      EFst <$> subExp,
+      ESnd <$> subExp,
+      EApp <$> subExp <*> subExp,
+      do
+        x <- arbitrary
+        ty <- arbitrary
+        ELam x ty <$> arbExpCtx (n `div` (m + 1)) (Snoc ctx (x, ty))
+    ]
+      ++ case ctx of
+        Emp -> []
+        Snoc ctx' (y, _) -> [EVar <$> arbName y ctx']
 
 arbExp :: Int -> Gen Exp
 arbExp n = arbExpCtx n Emp
@@ -132,10 +113,10 @@ instance Show Ty where
 
 prettyTy :: Ty -> PP.Doc ann
 prettyTy TNat = PP.pretty "ℕ"
-prettyTy TBool = PP.pretty "𝔹"
-prettyTy TUnit = PP.pretty "𝕌"
-prettyTy (TProd ty1 ty2) = PP.pretty "(" <+> prettyTy ty1 <+> PP.pretty "×" <+> prettyTy ty2 <+> PP.pretty ")"
-prettyTy (TFun ty1 ty2) = PP.pretty "(" <+> prettyTy ty1 <+> PP.pretty "→" <+> prettyTy ty2 <+> PP.pretty ")"
+prettyTy TBool = PP.pretty "𝟐"
+prettyTy TUnit = PP.pretty "𝟏"
+prettyTy (TProd ty1 ty2) = PP.pretty "(" <> prettyTy ty1 <+> PP.pretty "×" <+> prettyTy ty2 <> PP.pretty ")"
+prettyTy (TFun ty1 ty2) = PP.pretty "(" <> prettyTy ty1 <+> PP.pretty "→" <+> prettyTy ty2 <> PP.pretty ")"
 
 instance PP.Pretty Name where
   pretty (Name x) = PP.pretty x
@@ -148,15 +129,15 @@ instance Show Exp where
 
 prettyExp :: Exp -> PP.Doc ann
 prettyExp EZero = PP.pretty "0"
-prettyExp (ESucc e) = PP.pretty "S" <+> PP.pretty "(" <+> prettyExp e <+> PP.pretty ")"
+prettyExp (ESucc e) = PP.pretty "S" <> PP.pretty "(" <> prettyExp e <> PP.pretty ")"
 prettyExp ETrue = PP.pretty "true"
 prettyExp EFalse = PP.pretty "false"
-prettyExp (EIf e1 e2 e3) = PP.pretty "if" <+> prettyExp e1 <+> PP.pretty "then" <+> prettyExp e2 <+> PP.pretty "else" <+> prettyExp e3
+prettyExp (EIf e1 e2 e3) = PP.pretty "if" <+> PP.pretty "(" <> prettyExp e1 <> PP.pretty ")" <+> PP.pretty "then" <+> PP.pretty "(" <> prettyExp e2 <> PP.pretty ")" <+> PP.pretty "else" <+> PP.pretty "(" <> prettyExp e3 <> PP.pretty ")"
 prettyExp EUnit = PP.pretty "()"
-prettyExp (ETuple e1 e2) = PP.pretty "(" <+> prettyExp e1 <+> PP.pretty "," <+> prettyExp e2 <+> PP.pretty ")"
-prettyExp (EFst e) = PP.pretty "fst" <+> PP.pretty "(" <+> prettyExp e <+> PP.pretty ")"
-prettyExp (ESnd e) = PP.pretty "snd" <+> PP.pretty "(" <+> prettyExp e <+> PP.pretty ")"
+prettyExp (ETuple e1 e2) = PP.pretty "(" <> prettyExp e1 <> PP.pretty "," <+> prettyExp e2 <> PP.pretty ")"
+prettyExp (EFst e) = PP.pretty "fst" <> PP.pretty "(" <> prettyExp e <> PP.pretty ")"
+prettyExp (ESnd e) = PP.pretty "snd" <> PP.pretty "(" <> prettyExp e <> PP.pretty ")"
 prettyExp (EVar x) = PP.pretty x
-prettyExp (ELam x ty e) = PP.pretty "λ(" <+> PP.pretty x <+> PP.pretty ":" <+> prettyTy ty <+> PP.pretty "). " <+> prettyExp e
-prettyExp (EApp e1 e2) = PP.pretty "(" <+> prettyExp e1 <+> PP.pretty " " <+> prettyExp e2 <+> PP.pretty ")"
-prettyExp (ERec e1 e2 e3) = PP.pretty "rec(" <+> prettyExp e1 <+> PP.pretty "," <+> prettyExp e2 <+> PP.pretty "," <+> prettyExp e3 <+> PP.pretty ")"
+prettyExp (ELam x ty e) = PP.pretty "λ(" <> PP.pretty x <+> PP.pretty ":" <+> prettyTy ty <> PP.pretty ")." <+> prettyExp e
+prettyExp (EApp e1 e2) = PP.pretty "(" <> prettyExp e1 <+> prettyExp e2 <> PP.pretty ")"
+prettyExp (ERec e1 e2 e3) = PP.pretty "rec(" <> prettyExp e1 <> PP.pretty "," <+> prettyExp e2 <> PP.pretty "," <+> prettyExp e3 <> PP.pretty ")"
