@@ -1,9 +1,11 @@
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 -- | This is the Syntax of L6.
 module Lang.L6.Syntax.Extrinsic where
 
 import Prettyprinter ((<+>))
 import qualified Prettyprinter as PP
 import Prettyprinter.Render.String
+import Data.String
 import Test.QuickCheck
 
 data Ty
@@ -29,7 +31,7 @@ extendCtx :: Name -> Ty -> Ctx -> Ctx
 extendCtx x ty ctx = Snoc ctx (x, ty)
 
 newtype Name = Name String
-  deriving (Eq, Show)
+  deriving (Eq, Show, IsString)
 
 data Exp
   = EZero

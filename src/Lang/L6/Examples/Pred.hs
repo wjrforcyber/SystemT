@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 -- | Predecessor
 module Lang.L6.Examples.Pred where
 
@@ -21,12 +23,12 @@ predTy = TFun TNat TNat
 predExp :: Exp
 predExp =
   ELam
-    (Name "n")
+    "n"
     TNat
     ( ERec
         EZero
-        (ELam (Name "m") TNat (EVar (Name "m")))
-        (EVar (Name "n"))
+        (ELam "m" TNat (EVar "m"))
+        (EVar "n")
     )
 
 -- | check that both versions agree
