@@ -174,3 +174,18 @@ tcinfer (ERec e1 e2 e3) =
     _ <- tccheck e2 (TFun ty1 ty1)
     _ <- tccheck e3 TNat
     return ty1
+
+fv :: Exp -> [Name]
+fv EZero = []
+fv (ESucc e) = fv e
+fv ETrue = []
+fv EFalse = []
+fv (EIf e1 e2 e3) = fv e1 ++ fv e2 ++ fv e3
+fv EUnit = []
+fv (ETuple e1 e2) = fv e1 ++ fv e2
+fv (EFst e) = fv e
+fv (ESnd e) = fv e
+fv (EVar name) = [name]
+fv (ELam name _ e) = name : fv e
+fv (EApp e1 e2) = fv e1 ++ fv e2
+fv (ERec e1 e2 e3) = fv e1 ++ fv e2 ++ fv e3

@@ -172,31 +172,3 @@ isVal _ = False
 eval :: Exp -> Exp
 eval e =
   maybe e eval (evalStep e)
-
-fv :: Exp -> [Name]
-fv EZero = []
-fv (ESucc e) = fv e
-fv ETrue = []
-fv EFalse = []
-fv (EIf e1 e2 e3) =
-  do
-    case eval e1 of
-      ETrue -> fv e2
-      EFalse -> fv e3
-      _ -> error "Cannot deal"
-fv EUnit = []
-fv (ETuple e1 e2) = fv e1 ++ fv e2
-fv (EFst e) =
-  do
-    case eval e of
-      ETuple e1 _ -> fv e1
-      _ ->error "Cannot be used in EFst"
-fv (ESnd e) =
-  do
-    case eval e of
-      ETuple _ e2 -> fv e2
-      _ -> error "Cannot be used in ESnd"
-fv (EVar name) = [name]
-fv (ELam name _ e) = name : fv e
-fv (EApp e1 e2) = fv e1 ++ fv e2
-fv (ERec e1 e2 e3) = fv e1 ++ fv e2 ++ fv e3

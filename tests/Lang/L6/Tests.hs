@@ -23,14 +23,20 @@ tcL6Props :: TestTree
 tcL6Props =
   testGroup
     "Bidi-typecheck"
-    [ QC.testProperty "every well-typed expression can be inferred" $
-        \(e :: TcTyExp) ->
-          tcisSuccess (tcinfer (tcgetExp e)),
+    [ QC.testProperty "every expression is well-scoped" $
+        QC.withMaxSuccess 1_000_000 $ -- test 1 million times
+          \(e :: Exp) ->
+            null (fv e),
+      QC.testProperty "every well-typed expression can be inferred" $
+        QC.withMaxSuccess 1_000_000 $ -- test 1 million times
+          \(e :: TcTyExp) ->
+            tcisSuccess (tcinfer (tcgetExp e)),
       QC.testProperty "every well-typed expression can be checked for its type" $
-        \(e :: TcTyExp) ->
-          case runTC (tcinfer (tcgetExp e)) E.Emp of
-            Right ty -> tcisSuccess $ tccheck (tcgetExp e) ty
-            Left _ -> error $ "This cannot happen because" ++ show e ++ " is well-typed"
+        QC.withMaxSuccess 1_000_000 $ -- test 1 million times
+          \(e :: TcTyExp) ->
+            case runTC (tcinfer (tcgetExp e)) E.Emp of
+              Right ty -> tcisSuccess $ tccheck (tcgetExp e) ty
+              Left _ -> error $ "This cannot happen because" ++ show e ++ " is well-typed"
     ]
 
 evalL6Props :: TestTree
