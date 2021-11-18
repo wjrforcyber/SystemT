@@ -115,7 +115,7 @@ tccheck (EApp e1 e2) ty =
 tccheck (ERec e1 e2 e3) ty =
   do
     _ <- tccheck e1 ty
-    _ <- tccheck e2 (TProd ty ty)
+    _ <- tccheck e2 (TFun ty ty)
     _ <- tccheck e3 TNat
     return ()
 tccheck e ty = tcfail ("check: " ++ show e ++ " is not an expression of type " ++ show ty ++ "!")
