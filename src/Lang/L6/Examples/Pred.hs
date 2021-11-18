@@ -10,10 +10,8 @@ import qualified Test.QuickCheck as QC
 
 -- | pred in Haskell
 predHs :: Nat -> Nat
-predHs n =
-  case n of
-    Zero -> Zero
-    Succ m -> m
+predHs Zero = Zero
+predHs (Succ n) = n
 
 -- | type of pred in L6
 predTy :: Ty
@@ -25,10 +23,16 @@ predExp =
   ELam
     "n"
     TNat
-    ( ERec
-        EZero
-        (ELam "m" TNat (EVar "m"))
-        (EVar "n")
+    ( EFst
+        ( ERec
+            (ETuple EZero EZero)
+            ( ELam
+                "t"
+                (TProd TNat TNat)
+                (ETuple (ESnd (EVar "t")) (ESucc (ESnd (EVar "t"))))
+            )
+            (EVar "n")
+        )
     )
 
 -- | check that both versions agree

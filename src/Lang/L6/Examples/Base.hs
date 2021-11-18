@@ -4,6 +4,8 @@ module Lang.L6.Examples.Base
     Program (..),
     fromNat,
     toNat,
+    fromBool,
+    toBool,
   )
 where
 
@@ -30,3 +32,12 @@ toNat :: Exp -> Maybe Nat
 toNat EZero = Just Zero
 toNat (ESucc e) = Succ <$> toNat e
 toNat _ = Nothing
+
+fromBool :: Bool -> Exp
+fromBool True = ETrue
+fromBool False = EFalse
+
+toBool :: Exp -> Maybe Bool
+toBool ETrue = Just True
+toBool EFalse = Just False
+toBool _ = Nothing
