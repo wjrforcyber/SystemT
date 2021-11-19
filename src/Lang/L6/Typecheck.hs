@@ -1,7 +1,6 @@
 module Lang.L6.Typecheck where
 
 import Data.Either
-import Data.List
 import Lang.L6.Syntax.Extrinsic
 import Test.QuickCheck
 
@@ -187,6 +186,6 @@ fv (ETuple e1 e2) = fv e1 ++ fv e2
 fv (EFst e) = fv e
 fv (ESnd e) = fv e
 fv (EVar x) = [x]
-fv (ELam name _ e) = fv e \\ [name]
+fv (ELam x _ e) = [ y | y <- fv e, y /= x ]
 fv (EApp e1 e2) = fv e1 ++ fv e2
 fv (ERec e1 e2 e3) = fv e1 ++ fv e2 ++ fv e3
