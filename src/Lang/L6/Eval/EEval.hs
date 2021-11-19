@@ -129,16 +129,8 @@ evalStep (EIf EFalse _ e3) =
 -- products
 evalStep (EFst (ETuple e1 _)) =
   pure e1
-evalStep (EFst (ERec e1 _ EZero)) =
-  evalStep (EFst e1)
-evalStep (EFst (ERec e1 e2 (ESucc e))) =
-  evalStep (EFst (EApp e2 (ERec e1 e2 e)))
 evalStep (ESnd (ETuple _ e2)) =
   pure e2
-evalStep (ESnd (ERec _ e2 EZero)) =
-  evalStep (ESnd e2)
-evalStep (ESnd (ERec e1 e2 (ESucc e))) =
-  evalStep (ESnd (EApp e2 (ERec e1 e2 e)))
 -- functions
 evalStep (EApp (ELam x _ e1) e2) =
   pure (subst x e2 e1)
@@ -152,6 +144,12 @@ evalStep (ERec e1 e2 (ESucc e3)) =
 evalStep (EIf e1 e2 e3) =
   EIf <$> evalStep e1 <*> pure e2 <*> pure e3
 -- products
+evalStep (EFst e)
+  | isVal e = Nothing
+  | otherwise = EFst <$> evalStep e
+evalStep (ESnd e)
+  | isVal e = Nothing
+  | otherwise = ESnd <$> evalStep e
 evalStep (ETuple e1 e2)
   | isVal e1 && isVal e2 = Nothing
   | isVal e1 = ETuple <$> pure e1 <*> evalStep e2
