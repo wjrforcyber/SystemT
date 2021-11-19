@@ -26,7 +26,7 @@ tcL6Props =
     [ QC.testProperty "every expression is well-scoped" $
         QC.withMaxSuccess 1_000_000 $ -- test 1 million times
           \(e :: Exp) ->
-            null (fv e),
+            fv e === [],
       QC.testProperty "every well-typed expression can be inferred" $
         QC.withMaxSuccess 1_000_000 $ -- test 1 million times
           \(e :: TcTyExp) ->
