@@ -20,26 +20,26 @@ addTy = TFun TNat (TFun TNat TNat)
 addExp :: Exp
 addExp =
   ELam
-    "m"
+    "nat_n"
     TNat
     ( ELam
-        "n"
+        "nat_m"
         TNat
         ( ERec
-            (EVar "m")
+            (EVar "nat_m")
             ( ELam
-                "m"
+                "nat_t"
                 TNat
-                (ESucc (EVar "m"))
+                (ESucc (EVar "nat_t"))
             )
-            (EVar "n")
+            (EVar "nat_n")
         )
     )
 
 -- | check that both versions agree
 addProp :: QC.Property
 addProp = QC.property $ \n m ->
-  toNat (eval $ EApp (EApp addExp (fromNat m)) (fromNat n)) === Just (addHs n m)
+  toNat (eval $ EApp (EApp addExp (fromNat n)) (fromNat m)) === Just (addHs n m)
 
 addProg :: Program
 addProg = Program "add" addTy addExp addProp

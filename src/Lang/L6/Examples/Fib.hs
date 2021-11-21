@@ -19,6 +19,10 @@ fibTy :: Ty
 fibTy = TFun TNat TNat
 
 -- | pred in L6
+-- fibExp :: Exp -> Exp
+-- fibExp EZero = EZero
+-- fibExp (ESucc EZero) = (ESucc EZero)
+-- fibExp (ESucc (ESucc e)) = ERec(fibExp e, ,ESucc e )
 fibExp :: Exp
 fibExp = EZero
 

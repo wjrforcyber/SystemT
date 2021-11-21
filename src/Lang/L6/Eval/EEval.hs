@@ -134,6 +134,10 @@ evalStep (ESnd (ETuple _ e2)) =
 -- functions
 evalStep (EApp (ELam x _ e1) e2) =
   pure (subst x e2 e1)
+evalStep (EApp e1 e2)
+  | isVal e1 && isVal e2 = Nothing
+  | isVal e1 = EApp <$> pure e1 <*> evalStep e2
+  | otherwise = EApp <$> evalStep e1 <*> pure e2
 -- naturals
 evalStep (ERec e1 _ EZero) =
   pure e1
