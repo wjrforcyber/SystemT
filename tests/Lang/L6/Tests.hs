@@ -23,38 +23,56 @@ tcL6Props :: TestTree
 tcL6Props =
   testGroup
     "Bidi-typecheck"
-    [ QC.testProperty "every expression is well-scoped" $
+    [ QC.testProperty "every generated expression is well-scoped" $
         QC.withMaxSuccess 1_000_000 $ -- test 1 million times
           \(e :: Exp) ->
             fv e === [],
-      QC.testProperty "every well-typed expression can be inferred" $
+      QC.testProperty "every inferable expression can be inferred" $
         QC.withMaxSuccess 1_000_000 $ -- test 1 million times
           \(e :: TcTyExp) ->
             tcisSuccess (tcinfer (tcgetExp e)),
-      QC.testProperty "every well-typed expression can be checked for its type" $
+      QC.testProperty "every inferable expression can be checked for its inferred type" $
         QC.withMaxSuccess 1_000_000 $ -- test 1 million times
           \(e :: TcTyExp) ->
             case runTC (tcinfer (tcgetExp e)) E.Emp of
               Right ty -> tcisSuccess $ tccheck (tcgetExp e) ty
-              Left _ -> error $ "This cannot happen because" ++ show e ++ " is well-typed"
+              Left _ -> error $ "This cannot happen because" ++ show e ++ " is well-typed",
+      QC.testProperty "every well-typed expression can be inferred" $
+        QC.withMaxSuccess 1_000_000 $ -- test 1 million times
+          \(e :: TyExp) ->
+            tcisSuccess (tcinfer (getExp e)),
+      QC.testProperty "every well-typed expression can be checked for its type" $
+        QC.withMaxSuccess 1_000_000 $ -- test 1 million times
+          \(e :: TyExp) ->
+            tcisSuccess (tccheck (getExp e) (getTy e))
     ]
 
 evalL6Props :: TestTree
 evalL6Props =
   testGroup
     "eval"
-    [ QC.testProperty "1. Progress: Well-typed expressions always reduce to a value" $
+    [ QC.testProperty "Progress: Type-inferable expressions always reduce to a value" $
         QC.withMaxSuccess 1_000_000 $ -- test 1 million times
           QC.within 5000000 $ -- timeout after 5s
             \(e :: TcTyExp) ->
               EE.isVal (EE.eval (tcgetExp e)),
-      QC.testProperty "2. Type-preservation: Well-typed expressions reduce to a value of the same type" $
+      QC.testProperty "Type-preservation: Type-inferable expressions reduce to a value of the same type" $
         QC.withMaxSuccess 1_000_000 $ -- test 1 million times
           QC.within 5000000 $ -- timeout after 5s
             \(e :: TcTyExp) ->
               case runTC (tcinfer (tcgetExp e)) E.Emp of
                 Right ty -> tcisSuccess $ tccheck (EE.eval (tcgetExp e)) ty
-                Left _ -> error $ "This cannot happen because" ++ show e ++ " is well-typed"
+                Left _ -> error $ "This cannot happen because" ++ show e ++ " is well-typed",
+      QC.testProperty "Progress: Well-typed expressions always reduce to a value" $
+        QC.withMaxSuccess 1_000_000 $ -- test 1 million times
+          QC.within 5000000 $ -- timeout after 5s
+            \(e :: TyExp) ->
+              EE.isVal (EE.eval (getExp e)),
+      QC.testProperty "Type-preservation: Well-typed expressions reduce to a value of the same type" $
+        QC.withMaxSuccess 1_000_000 $ -- test 1 million times
+          QC.within 5000000 $ -- timeout after 5s
+            \(e :: TyExp) ->
+              tcisSuccess (tccheck (EE.eval (getExp e)) (getTy e))
     ]
 
 unitTests :: TestTree

@@ -7,6 +7,9 @@ import Test.QuickCheck
 newtype TcTyExp = TcTyExp {tcgetExp :: Exp}
   deriving (Eq, Show)
 
+data TyExp = TyExp {getTy :: Ty, getExp :: Exp}
+  deriving (Eq, Show)
+
 newtype TC a = TC {runTC :: Ctx -> Either TCError a}
 
 instance Functor TC where
@@ -61,6 +64,13 @@ tcextend name ty (TC f) = TC $ \ctx -> f (extendCtx name ty ctx)
 
 instance Arbitrary TcTyExp where
   arbitrary = TcTyExp <$> (arbitrary `suchThat` \e -> tcisSuccess $ tcinfer e)
+
+instance Arbitrary TyExp where
+  arbitrary =
+    sized $ \n -> do
+      ty <- arbitrary
+      e <- arbExpCtxTy n Emp ty
+      pure (TyExp ty e)
 
 --TC Check
 tccheck :: Exp -> Ty -> TC ()
@@ -186,6 +196,6 @@ fv (ETuple e1 e2) = fv e1 ++ fv e2
 fv (EFst e) = fv e
 fv (ESnd e) = fv e
 fv (EVar x) = [x]
-fv (ELam x _ e) = [ y | y <- fv e, y /= x ]
+fv (ELam x _ e) = [y | y <- fv e, y /= x]
 fv (EApp e1 e2) = fv e1 ++ fv e2
 fv (ERec e1 e2 e3) = fv e1 ++ fv e2 ++ fv e3

@@ -69,10 +69,54 @@ instance Arbitrary Name where
 arbName :: Name -> Ctx -> Gen Name
 arbName x Emp = pure x
 arbName x (Snoc ctx' (y, _)) =
-  oneof
-    [ pure x,
-      arbName y ctx'
-    ]
+  oneof [pure x, arbName y ctx']
+
+arbFreshName :: Ctx -> Gen Name
+arbFreshName Emp = arbitrary
+arbFreshName (Snoc ctx' (y, _)) =
+  arbFreshName ctx' `suchThat` (/= y)
+
+synthVar :: Ctx -> Ty -> [Gen Exp]
+synthVar Emp _ = []
+synthVar (Snoc ctx' (x, ty')) ty
+  | ty == ty' = pure (EVar x) : synthVar ctx' ty
+  | otherwise = synthVar ctx' ty
+
+synthElim :: Int -> Ctx -> Ty -> [Gen Exp]
+synthElim n ctx ty =
+  let synth = arbExpCtxTy n ctx
+   in [ arbitrary >>= \ty' -> EFst <$> synth (TProd ty ty'),
+        arbitrary >>= \ty' -> ESnd <$> synth (TProd ty' ty),
+        arbitrary >>= \ty' -> EApp <$> synth (TFun ty' ty) <*> synth ty',
+        EIf <$> synth TBool <*> synth ty <*> synth ty,
+        ERec <$> synth ty <*> synth (TFun ty ty) <*> synth TNat
+      ]
+
+synthAux :: (Ctx -> Ty -> Gen Exp) -> Ctx -> Ty -> [Gen Exp]
+synthAux synth ctx ty =
+  case ty of
+    TNat ->
+      [pure EZero, ESucc <$> synth ctx TNat]
+    TBool ->
+      [pure ETrue, pure EFalse]
+    TUnit ->
+      [pure EUnit]
+    TProd ty1 ty2 ->
+      [ETuple <$> synth ctx ty1 <*> synth ctx ty2]
+    TFun ty1 ty2 ->
+      [arbFreshName ctx >>= \x -> ELam x ty1 <$> synth (extendCtx x ty1 ctx) ty2]
+
+arbExpCtxTy :: Int -> Ctx -> Ty -> Gen Exp
+arbExpCtxTy 0 ctx ty =
+  oneof $
+    synthVar ctx ty
+      ++ synthAux (arbExpCtxTy 0) ctx ty
+arbExpCtxTy n ctx ty = do
+  let p = n `div` 2
+  oneof $
+    synthVar ctx ty
+      ++ synthElim p ctx ty
+      ++ synthAux (arbExpCtxTy p) ctx ty
 
 arbExpCtx :: Int -> Ctx -> Gen Exp
 arbExpCtx 0 ctx =
@@ -86,8 +130,7 @@ arbExpCtx 0 ctx =
         Emp -> []
         Snoc ctx' (x, _) -> [EVar <$> arbName x ctx']
 arbExpCtx n ctx = do
-  (Positive m) <- arbitrary
-  let subExp = arbExpCtx (n `div` (m + 1)) ctx
+  let subExp = arbExpCtx (n `div` 2) ctx
   oneof $
     [ ESucc <$> subExp,
       ERec <$> subExp <*> subExp <*> subExp,
@@ -99,7 +142,7 @@ arbExpCtx n ctx = do
       do
         x <- arbitrary
         ty <- arbitrary
-        ELam x ty <$> arbExpCtx (n `div` (m + 1)) (Snoc ctx (x, ty))
+        ELam x ty <$> arbExpCtx n (Snoc ctx (x, ty))
     ]
       ++ case ctx of
         Emp -> []
@@ -141,6 +184,6 @@ prettyExp (ETuple e1 e2) = PP.pretty "(" <> prettyExp e1 <> PP.pretty "," <+> pr
 prettyExp (EFst e) = PP.pretty "fst" <> PP.pretty "(" <> prettyExp e <> PP.pretty ")"
 prettyExp (ESnd e) = PP.pretty "snd" <> PP.pretty "(" <> prettyExp e <> PP.pretty ")"
 prettyExp (EVar x) = PP.pretty x
-prettyExp (ELam x ty e) = PP.pretty "λ(" <> PP.pretty x <+> PP.pretty ":" <+> prettyTy ty <> PP.pretty ")." <+> prettyExp e
+prettyExp (ELam x ty e) = PP.pretty "(λ(" <> PP.pretty x <+> PP.pretty ":" <+> prettyTy ty <> PP.pretty ")." <+> prettyExp e <> PP.pretty ")"
 prettyExp (EApp e1 e2) = PP.pretty "(" <> prettyExp e1 <+> prettyExp e2 <> PP.pretty ")"
 prettyExp (ERec e1 e2 e3) = PP.pretty "rec(" <> prettyExp e1 <> PP.pretty "," <+> prettyExp e2 <> PP.pretty "," <+> prettyExp e3 <> PP.pretty ")"
