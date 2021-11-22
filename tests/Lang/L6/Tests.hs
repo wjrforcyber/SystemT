@@ -34,9 +34,7 @@ tcL6Props =
       QC.testProperty "every inferable expression can be checked for its inferred type" $
         QC.withMaxSuccess 1_000_000 $ -- test 1 million times
           \(e :: TcTyExp) ->
-            case runTC (tcinfer (tcgetExp e)) E.Emp of
-              Right ty -> tcisSuccess $ tccheck (tcgetExp e) ty
-              Left _ -> error $ "This cannot happen because" ++ show e ++ " is well-typed",
+            tcisSuccess (tccheck (tcgetExp e) (tcgetTy e)),
       QC.testProperty "every well-typed expression can be inferred" $
         QC.withMaxSuccess 1_000_000 $ -- test 1 million times
           \(e :: TyExp) ->
@@ -53,24 +51,24 @@ evalL6Props =
     "eval"
     [ QC.testProperty "Progress: Type-inferable expressions always reduce to a value" $
         QC.withMaxSuccess 1_000_000 $ -- test 1 million times
-          QC.within 5000000 $ -- timeout after 5s
+          QC.within 5_000_000 $ -- timeout after 5s
             \(e :: TcTyExp) ->
               EE.isVal (EE.eval (tcgetExp e)),
       QC.testProperty "Type-preservation: Type-inferable expressions reduce to a value of the same type" $
         QC.withMaxSuccess 1_000_000 $ -- test 1 million times
-          QC.within 5000000 $ -- timeout after 5s
+          QC.within 5_000_000 $ -- timeout after 5s
             \(e :: TcTyExp) ->
               case runTC (tcinfer (tcgetExp e)) E.Emp of
                 Right ty -> tcisSuccess $ tccheck (EE.eval (tcgetExp e)) ty
                 Left _ -> error $ "This cannot happen because" ++ show e ++ " is well-typed",
       QC.testProperty "Progress: Well-typed expressions always reduce to a value" $
         QC.withMaxSuccess 1_000_000 $ -- test 1 million times
-          QC.within 5000000 $ -- timeout after 5s
+          QC.within 5_000_000 $ -- timeout after 5s
             \(e :: TyExp) ->
               EE.isVal (EE.eval (getExp e)),
       QC.testProperty "Type-preservation: Well-typed expressions reduce to a value of the same type" $
         QC.withMaxSuccess 1_000_000 $ -- test 1 million times
-          QC.within 5000000 $ -- timeout after 5s
+          QC.within 5_000_000 $ -- timeout after 5s
             \(e :: TyExp) ->
               tcisSuccess (tccheck (EE.eval (getExp e)) (getTy e))
     ]

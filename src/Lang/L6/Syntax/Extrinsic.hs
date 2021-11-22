@@ -112,7 +112,8 @@ arbExpCtxTy 0 ctx ty =
     synthVar ctx ty
       ++ synthAux (arbExpCtxTy 0) ctx ty
 arbExpCtxTy n ctx ty = do
-  let p = n `div` 2
+  (Positive m) <- arbitrary
+  let p = n `div` (m + 1)
   oneof $
     synthVar ctx ty
       ++ synthElim p ctx ty
@@ -130,7 +131,8 @@ arbExpCtx 0 ctx =
         Emp -> []
         Snoc ctx' (x, _) -> [EVar <$> arbName x ctx']
 arbExpCtx n ctx = do
-  let subExp = arbExpCtx (n `div` 2) ctx
+  (Positive m) <- arbitrary
+  let subExp = arbExpCtx (n `div` (m + 1)) ctx
   oneof $
     [ ESucc <$> subExp,
       ERec <$> subExp <*> subExp <*> subExp,

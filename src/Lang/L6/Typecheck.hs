@@ -4,7 +4,7 @@ import Data.Either
 import Lang.L6.Syntax.Extrinsic
 import Test.QuickCheck
 
-newtype TcTyExp = TcTyExp {tcgetExp :: Exp}
+data TcTyExp = TcTyExp {tcgetTy :: Ty, tcgetExp :: Exp}
   deriving (Eq, Show)
 
 data TyExp = TyExp {getTy :: Ty, getExp :: Exp}
@@ -63,7 +63,11 @@ tcextend :: Name -> Ty -> TC a -> TC a
 tcextend name ty (TC f) = TC $ \ctx -> f (extendCtx name ty ctx)
 
 instance Arbitrary TcTyExp where
-  arbitrary = TcTyExp <$> (arbitrary `suchThat` \e -> tcisSuccess $ tcinfer e)
+  arbitrary =
+    arbitrary `suchThatMap` \e ->
+      case runTC (tcinfer e) Emp of
+        Left _ -> Nothing
+        Right ty -> Just $ TcTyExp ty e
 
 instance Arbitrary TyExp where
   arbitrary =
