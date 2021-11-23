@@ -7,6 +7,7 @@ module Lang.L6.Examples
     fibProg,
     mulProg,
     expoProg,
+    tetProg,
   )
 where
 
@@ -17,3 +18,4 @@ import Lang.L6.Examples.Fib (fibProg)
 import Lang.L6.Examples.IsZero (isZeroProg)
 import Lang.L6.Examples.Mul (mulProg)
 import Lang.L6.Examples.Pred (predProg)
+import Lang.L6.Examples.Tet (tetProg)

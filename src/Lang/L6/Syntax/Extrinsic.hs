@@ -1,9 +1,14 @@
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
 -- | This is the Syntax of L6.
 module Lang.L6.Syntax.Extrinsic where
 
+import Control.DeepSeq
 import Data.String
+import GHC.Generics
 import Prettyprinter ((<+>))
 import qualified Prettyprinter as PP
 import Prettyprinter.Render.String
@@ -15,12 +20,12 @@ data Ty
   | TUnit
   | TProd Ty Ty
   | TFun Ty Ty
-  deriving (Eq)
+  deriving (Eq, Generic, NFData)
 
 data Ctx
   = Emp
   | Snoc Ctx (Name, Ty)
-  deriving (Eq, Show)
+  deriving (Eq, Show, Generic, NFData)
 
 lookupCtx :: Name -> Ctx -> Maybe Ty
 lookupCtx _ Emp = Nothing
@@ -32,7 +37,7 @@ extendCtx :: Name -> Ty -> Ctx -> Ctx
 extendCtx x ty ctx = Snoc ctx (x, ty)
 
 newtype Name = Name String
-  deriving (Eq, Show, IsString)
+  deriving newtype (Eq, Show, IsString, NFData)
 
 data Exp
   = EZero
@@ -48,7 +53,7 @@ data Exp
   | ELam Name Ty Exp --abstraction
   | EApp Exp Exp --application
   | ERec Exp Exp Exp
-  deriving (Eq)
+  deriving (Eq, Generic, NFData)
 
 instance Arbitrary Ty where
   arbitrary =

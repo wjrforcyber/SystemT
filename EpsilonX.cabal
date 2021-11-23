@@ -20,6 +20,7 @@ common common-deps
     -Wall
     -Wextra
     -Werror
+    -O2
   other-modules:
     Paths_EpsilonX
 
@@ -57,6 +58,7 @@ library
         Lang.L6.Examples.Fib
         Lang.L6.Examples.Mul
         Lang.L6.Examples.Expo
+        Lang.L6.Examples.Tet
 
     other-modules:
     hs-source-dirs:   src

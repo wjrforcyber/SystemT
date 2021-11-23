@@ -6,8 +6,7 @@ module Lang.L6.Examples.Fib where
 import Lang.L6.Eval.EEval
 import Lang.L6.Examples.Add (addExp)
 import Lang.L6.Examples.Base
-import Test.QuickCheck ((===))
-import qualified Test.QuickCheck as QC
+import Test.QuickCheck as QC
 
 -- | pred in Haskell
 fibHs :: Nat -> Nat
@@ -26,30 +25,40 @@ fibTy = TFun TNat TNat
 -- fibExp (ESucc (ESucc e)) = ERec(fibExp e, ,ESucc e )
 
 --TODO
-fibExp :: Exp
-fibExp =
+
+fibExp2 :: Exp
+fibExp2 =
   ELam
     "fib_n"
     TNat
     ( ERec
-        EZero
-        -- ( ELam
-        --     "fib_m"
-        --     TNat
-        -- (ERec
-        --   (ESucc EZero)
-        --   addExp
-        --   (EVar "fib_m")
-        -- )
-        -- )
-        addExp
+        (ETuple EZero (ESucc EZero))
+        ( ELam
+            "fib_t"
+            (TProd TNat TNat)
+            ( ETuple
+                (ESnd (EVar "fib_t"))
+                ( EApp
+                    (EApp addExp (EFst (EVar "fib_t")))
+                    (ESnd (EVar "fib_t"))
+                )
+            )
+        )
         (EVar "fib_n")
     )
 
+fibExp :: Exp
+fibExp =
+  ELam
+    "fib_m"
+    TNat
+    (EFst (EApp fibExp2 (EVar "fib_m")))
+
 -- | check that both versions agree
-fibProp :: QC.Property
-fibProp = QC.property $ \n ->
-  toNat (eval $ EApp fibExp (fromNat n)) === Just (fibHs n)
+fibProp :: Property
+fibProp = property $
+  forAll (arbitrary `suchThat` (<= 10)) $ \n ->
+    toNat (eval $ EApp fibExp (fromNat n)) === Just (fibHs n)
 
 fibProg :: Program
 fibProg = Program "fib" fibTy fibExp fibProp

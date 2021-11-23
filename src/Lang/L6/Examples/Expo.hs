@@ -7,8 +7,7 @@ module Lang.L6.Examples.Expo where
 import Lang.L6.Eval.EEval
 import Lang.L6.Examples.Base
 import Lang.L6.Examples.Mul (mulExp)
-import Test.QuickCheck ((===))
-import qualified Test.QuickCheck as QC
+import Test.QuickCheck as QC
 
 -- | expo in Haskell
 expoHs :: Nat -> Nat -> Nat
@@ -36,11 +35,10 @@ expoExp =
     )
 
 -- | check that both versions agree
-expoProp :: QC.Property
-expoProp = QC.property $
-  QC.withMaxSuccess 5 $ -- test 5 times
-    \n m ->
-      toNat (eval $ EApp (EApp expoExp (fromNat n)) (fromNat m)) === Just (expoHs n m)
+expoProp :: Property
+expoProp = property $
+  forAll (arbitrary `suchThat` (<= 10)) $ \n m ->
+    toNat (eval $ EApp (EApp expoExp (fromNat n)) (fromNat m)) === Just (expoHs n m)
 
 expoProg :: Program
 expoProg = Program "expo" expoTy expoExp expoProp
