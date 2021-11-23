@@ -55,6 +55,7 @@ library
         Lang.L6.Examples.Pred
         Lang.L6.Examples.Add
         Lang.L6.Examples.Fib
+        Lang.L6.Examples.Mul
 
     other-modules:
     hs-source-dirs:   src

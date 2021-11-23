@@ -4,7 +4,8 @@ module Lang.L6.Examples
     isZeroProg,
     predProg,
     addProg,
-    fibProg
+    fibProg,
+    mulProg
   )
 where
 
@@ -13,3 +14,4 @@ import Lang.L6.Examples.IsZero (isZeroProg)
 import Lang.L6.Examples.Pred (predProg)
 import Lang.L6.Examples.Add (addProg)
 import Lang.L6.Examples.Fib (fibProg)
+import Lang.L6.Examples.Mul (mulProg)

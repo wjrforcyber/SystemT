@@ -8,7 +8,7 @@ import Lang.L6.Examples.Base
 import Test.QuickCheck ((===))
 import qualified Test.QuickCheck as QC
 
--- | pred in Haskell
+-- | add in Haskell
 addHs :: Nat -> Nat -> Nat
 addHs Zero n = n
 addHs (Succ n) m = Succ (n + m)

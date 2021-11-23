@@ -4,6 +4,7 @@
 module Lang.L6.Examples.Fib where
 
 import Lang.L6.Eval.EEval
+import Lang.L6.Examples.Add (addExp)
 import Lang.L6.Examples.Base
 import Test.QuickCheck ((===))
 import qualified Test.QuickCheck as QC
@@ -23,10 +24,27 @@ fibTy = TFun TNat TNat
 -- fibExp EZero = EZero
 -- fibExp (ESucc EZero) = (ESucc EZero)
 -- fibExp (ESucc (ESucc e)) = ERec(fibExp e, ,ESucc e )
-fibExp :: Exp
-fibExp = EZero
 
 --TODO
+fibExp :: Exp
+fibExp =
+  ELam
+    "fib_n"
+    TNat
+    ( ERec
+        EZero
+        -- ( ELam
+        --     "fib_m"
+        --     TNat
+        -- (ERec
+        --   (ESucc EZero)
+        --   addExp
+        --   (EVar "fib_m")
+        -- )
+        -- )
+        addExp
+        (EVar "fib_n")
+    )
 
 -- | check that both versions agree
 fibProp :: QC.Property
