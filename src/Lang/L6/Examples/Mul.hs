@@ -14,7 +14,7 @@ mulHs :: Nat -> Nat -> Nat
 mulHs Zero _ = Zero
 mulHs (Succ n) m = n * m + m
 
--- | type of add in L6
+-- | type of mul in L6
 mulTy :: Ty
 mulTy = TFun TNat (TFun TNat TNat)
 
