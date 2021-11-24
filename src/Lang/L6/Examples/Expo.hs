@@ -37,7 +37,8 @@ expoExp =
 -- | check that both versions agree
 expoProp :: Property
 expoProp = property $
-  forAll (arbitrary `suchThat` (<= 10)) $ \n m ->
+  -- forAll (arbitrary `suchThat` (<= 5)) $ \n m ->
+  QC.withMaxSuccess 5 $ \n m ->
     toNat (eval $ EApp (EApp expoExp (fromNat n)) (fromNat m)) === Just (expoHs n m)
 
 expoProg :: Program
