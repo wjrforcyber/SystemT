@@ -8,9 +8,11 @@ module Lang.L6.Examples
     mulProg,
     expoProg,
     tetProg,
+    ackerProg,
   )
 where
 
+import Lang.L6.Examples.Acker (ackerProg)
 import Lang.L6.Examples.Add (addProg)
 import Lang.L6.Examples.Base
 import Lang.L6.Examples.Expo (expoProg)

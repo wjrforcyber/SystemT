@@ -59,6 +59,7 @@ library
         Lang.L6.Examples.Mul
         Lang.L6.Examples.Expo
         Lang.L6.Examples.Tet
+        Lang.L6.Examples.Acker
 
     other-modules:
     hs-source-dirs:   src

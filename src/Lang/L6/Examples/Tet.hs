@@ -37,8 +37,8 @@ tetExp =
 -- | check that both versions agree
 tetProp :: QC.Property
 tetProp = QC.property $
-  QC.withMaxSuccess 5 $
-    forAll (arbitrary `suchThat` (<= 2)) $
+  -- QC.withMaxSuccess 5 $
+    forAll (arbitrary `suchThat` (<= 3)) $
       \a n ->
         toNat (eval $ EApp (EApp tetExp (fromNat a)) (fromNat n)) === Just (tetHs a n)
 
