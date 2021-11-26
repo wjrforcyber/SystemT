@@ -9,6 +9,7 @@ module Lang.L6.Examples
     expoProg,
     tetProg,
     ackerProg,
+    facProg,
   )
 where
 
@@ -21,3 +22,4 @@ import Lang.L6.Examples.IsZero (isZeroProg)
 import Lang.L6.Examples.Mul (mulProg)
 import Lang.L6.Examples.Pred (predProg)
 import Lang.L6.Examples.Tet (tetProg)
+import Lang.L6.Examples.Fac (facProg)
