@@ -61,6 +61,7 @@ library
         Lang.L6.Examples.Tet
         Lang.L6.Examples.Acker
         Lang.L6.Examples.Fac
+        Lang.L6.Examples.Double
 
     other-modules:
     hs-source-dirs:   src
