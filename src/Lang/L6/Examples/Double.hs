@@ -4,13 +4,15 @@
 module Lang.L6.Examples.Double where
 
 import Lang.L6.Eval.EEval
+import Lang.L6.Examples.Add (addHs)
 import Lang.L6.Examples.Base
 import Test.QuickCheck ((===))
 import qualified Test.QuickCheck as QC
 
 -- | Double in Haskell
 doubleHs :: Nat -> Nat
-doubleHs n = 2 * n
+doubleHs Zero = Zero
+doubleHs n = addHs n n
 
 -- | type of Double in L6
 doubleTy :: Ty
