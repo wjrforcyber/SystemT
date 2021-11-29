@@ -1,13 +1,14 @@
-{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+
 -- | Some useful types.
 module Common.Types where
 
+import Control.DeepSeq (NFData)
+import GHC.Generics (Generic)
 import Numeric.Natural
 import Prettyprinter
 import Test.QuickCheck
-import GHC.Generics (Generic)
-import Control.DeepSeq (NFData)
 
 data Nat = Zero | Succ Nat deriving (Eq, Ord, Generic, NFData)
 
@@ -18,7 +19,6 @@ toNatural (Succ n) = succ (toNatural n)
 fromNatural :: Natural -> Nat
 fromNatural 0 = Zero
 fromNatural n = Succ (fromNatural (pred n))
-
 
 instance Show Nat where
   showsPrec p = showsPrec p . toNatural

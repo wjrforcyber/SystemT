@@ -5,6 +5,8 @@ import Control.Exception
 import Criterion.Main
 import Lang.L1.Eval as L1
 import Lang.L1.Syntax as L1
+import Lang.L5.Eval.EEval as L5
+import Lang.L5.Syntax.Extrinsic as L5
 import Lang.L6.Eval.EEval as L6
 import Lang.L6.Examples.Add as L6
 import Lang.L6.Examples.Base as L6
@@ -37,46 +39,51 @@ main =
       bgroup
         "isZero"
         [ bench "isZeroHs" $ nf L6.isZeroHs 10,
-          bench "isZeroExp" $ nf L6.eval (EApp isZeroExp (fromNat 10))
+          bench "isZeroExp" $ nf L6.eval (L6.EApp isZeroExp (L6.fromNat 10))
         ],
       bgroup
         "pred"
         [ bench "predHs" $ nf L6.predHs 10,
-          bench "predExp" $ nf L6.eval (EApp predExp (fromNat 10))
+          bench "predExp" $ nf L6.eval (L6.EApp predExp (L6.fromNat 10))
         ],
       bgroup
         "fib"
         [ bench "fibHs" $ nf L6.fibHs 10,
-          bench "fibExp" $ nf L6.eval (EApp fibExp (fromNat 10))
+          bench "fibExp" $ nf L6.eval (L6.EApp fibExp (L6.fromNat 10))
         ],
       bgroup
         "add"
         [ bench "addHs" $ nf (L6.addHs 10) 20,
-          bench "addExp" $ nf L6.eval (EApp (EApp addExp (fromNat 10)) (fromNat 20))
+          bench "addExp" $ nf L6.eval (L6.EApp (L6.EApp addExp (L6.fromNat 10)) (L6.fromNat 20))
         ],
       bgroup
         "double"
         [ bench "doubleHs" $ nf L6.doubleHs 10,
-          bench "doubleExp" $ nf L6.eval (EApp doubleExp (fromNat 10))
+          bench "doubleExp" $ nf L6.eval (L6.EApp doubleExp (L6.fromNat 10))
         ],
       bgroup
         "expo"
         [ bench "expoHs" $ nf (L6.expoHs 2) 3,
-          bench "doubleExp" $ nf L6.eval (EApp (EApp expoExp (fromNat 2)) (fromNat 3))
+          bench "doubleExp" $ nf L6.eval (L6.EApp (L6.EApp expoExp (L6.fromNat 2)) (L6.fromNat 3))
         ],
       bgroup
         "fac"
         [ bench "facHs" $ nf L6.doubleHs 5,
-          bench "facExp" $ nf L6.eval (EApp facExp (fromNat 5))
+          bench "facExp" $ nf L6.eval (L6.EApp facExp (L6.fromNat 5))
         ],
       bgroup
         "mul"
         [ bench "mulHs" $ nf (L6.mulHs 10) 20,
-          bench "mulExp" $ nf L6.eval (EApp (EApp mulExp (fromNat 10)) (fromNat 20))
+          bench "mulExp" $ nf L6.eval (L6.EApp (L6.EApp mulExp (L6.fromNat 10)) (L6.fromNat 20))
         ],
       bgroup
         "tet"
         [ bench "tetHs" $ nf (L6.tetHs 2) 3,
-          bench "tetExp" $ nf L6.eval (EApp (EApp tetExp (fromNat 2)) (fromNat 3))
+          bench "tetExp" $ nf L6.eval (L6.EApp (L6.EApp tetExp (L6.fromNat 2)) (L6.fromNat 3))
+        ],
+      bgroup
+        "Add in L5 VS Add in L6"
+        [ bench "L5 Add" $ nf L5.eval (L5.EAdd (L5.fromNat 10) (L5.fromNat 20)),
+          bench "L6 Add" $ nf L6.eval (L6.EApp (L6.EApp addExp (L6.fromNat 10)) (L6.fromNat 20))
         ]
     ]

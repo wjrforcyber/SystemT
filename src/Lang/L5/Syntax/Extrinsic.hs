@@ -1,9 +1,15 @@
-{-# OPTIONS_GHC -Wno-typed-holes #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
--- | This is the Syntax of L5.
+-- | This is the Syntax of L6.
 module Lang.L5.Syntax.Extrinsic where
 
-import Common.Types
+import Common.Types (Nat)
+import Control.DeepSeq
+import Data.String
+import GHC.Generics
 import Prettyprinter ((<+>))
 import qualified Prettyprinter as PP
 import Prettyprinter.Render.String
@@ -15,12 +21,12 @@ data Ty
   | TUnit
   | TProd Ty Ty
   | TFun Ty Ty
-  deriving (Eq)
+  deriving (Eq, Generic, NFData)
 
 data Ctx
   = Emp
   | Snoc Ctx (Name, Ty)
-  deriving (Eq, Show)
+  deriving (Eq, Show, Generic, NFData)
 
 lookupCtx :: Name -> Ctx -> Maybe Ty
 lookupCtx _ Emp = Nothing
@@ -32,7 +38,7 @@ extendCtx :: Name -> Ty -> Ctx -> Ctx
 extendCtx x ty ctx = Snoc ctx (x, ty)
 
 newtype Name = Name String
-  deriving (Eq, Show)
+  deriving (Eq, Show, IsString, NFData)
 
 data Exp
   = EZero
@@ -49,7 +55,7 @@ data Exp
   | EVar Name --variables
   | ELam Name Ty Exp --abstraction
   | EApp Exp Exp --application
-  deriving (Eq)
+  deriving (Eq, Generic, NFData)
 
 data Val
   = VSuccN Nat
@@ -58,7 +64,7 @@ data Val
   | VUnit
   | VTuple Val Val
   | VLam Name Ty Exp
-  deriving (Eq, Show)
+  deriving (Eq, Show, Generic, NFData)
 
 instance Arbitrary Ty where
   arbitrary =
