@@ -38,7 +38,7 @@ extendCtx :: Name -> Ty -> Ctx -> Ctx
 extendCtx x ty ctx = Snoc ctx (x, ty)
 
 newtype Name = Name String
-  deriving (Eq, Show, IsString, NFData)
+  deriving newtype (Eq, Show, IsString, NFData)
 
 data Exp
   = EZero

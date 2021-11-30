@@ -5,7 +5,7 @@ import Control.Exception
 import Criterion.Main
 import Lang.L1.Eval as L1
 import Lang.L1.Syntax as L1
-import Lang.L5.Eval.EEval as L5
+import Lang.L5.Eval.EEval as L5EE
 import Lang.L5.Syntax.Extrinsic as L5
 import Lang.L6.Eval.EEval as L6
 import Lang.L6.Examples.Add as L6
@@ -83,7 +83,7 @@ main =
         ],
       bgroup
         "Add in L5 VS Add in L6"
-        [ bench "L5 Add" $ nf L5.eval (L5.EAdd (L5.fromNat 10) (L5.fromNat 20)),
+        [ bench "L5 Add" $ nf (L5EE.runEval (L5EE.eval (L5.EAdd (L5EE.fromNat 10) (L5EE.fromNat 20)))) L5EE.Emp,
           bench "L6 Add" $ nf L6.eval (L6.EApp (L6.EApp addExp (L6.fromNat 10)) (L6.fromNat 20))
         ]
     ]
