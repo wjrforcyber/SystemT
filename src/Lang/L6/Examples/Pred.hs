@@ -38,7 +38,7 @@ predExp =
 -- | check that both versions agree
 predProp :: QC.Property
 predProp = QC.property $ \n ->
-  toNat (eval $ EApp predExp (fromNat n)) === Just (predHs n)
+  toNat (evalStar $ EApp predExp (fromNat n)) === Just (predHs n)
 
 predProg :: Program
 predProg = Program "pred" predTy predExp predProp

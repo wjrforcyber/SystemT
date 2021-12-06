@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Criterion benchmarks" tests="33">
+  <testcase name="eval/eval" time="0.0007696521605634718" />
+  <testcase name="eval/opt" time="0.007227588984088064" />
+  <testcase name="eval/opt2" time="0.0009186000076781628" />
+  <testcase name="isZero/isZeroHs" time="0.000000008604443052193443" />
+  <testcase name="isZero/*isZeroExp" time="0.00000011127425053503748" />
+  <testcase name="isZero/isZeroExp" time="0.00000020070270002367281" />
+  <testcase name="pred/predHs" time="0.000000021263288631861048" />
+  <testcase name="pred/*predExp" time="0.000004562577869712228" />
+  <testcase name="pred/predExp" time="0.0002210881256700202" />
+  <testcase name="fib/fibHs" time="0.0000030496266712806456" />
+  <testcase name="fib/*fibExp" time="0.0017268699328938893" />
+  <testcase name="fib/fibExp" time="0.032296077631172176" />
+  <testcase name="add/addHs" time="0.00000011231301052595696" />
+  <testcase name="add/*addExp" time="0.0000037564188806979226" />
+  <testcase name="add/addExp" time="0.0000022328287654546747" />
+  <testcase name="double/doubleHs" time="0.00000010995541674110777" />
+  <testcase name="double/*doubleExp" time="0.0000035145858670145248" />
+  <testcase name="double/doubleExp" time="0.00000485199792528921" />
+  <testcase name="expo/expoHs" time="0.0000002596881279776798" />
+  <testcase name="expo/*doubleExp" time="0.000029787551612820723" />
+  <testcase name="expo/doubleExp" time="0.000014731540319810546" />
+  <testcase name="fac/facHs" time="0.00000005630886489321616" />
+  <testcase name="fac/*facExp" time="0.028904721545377543" />
+  <testcase name="fac/facExp" time="0.002508630348152154" />
+  <testcase name="mul/mulHs" time="0.0000028668784512325337" />
+  <testcase name="mul/*mulExp" time="0.00673958788749298" />
+  <testcase name="mul/mulExp" time="0.00004013394836848968" />
+  <testcase name="tet/tetHs" time="0.0000006057684396128875" />
+  <testcase name="tet/*tetExp" time="0.0002398063107580241" />
+  <testcase name="tet/tetExp" time="0.00004158855450173795" />
+  <testcase name="Add in L5 VS Add in L6/L5 Add" time="0.0000008680741478803376" />
+  <testcase name="Add in L5 VS Add in L6/*L6 Add" time="0.0000040585933531903845" />
+  <testcase name="Add in L5 VS Add in L6/L6 Add" time="0.0000021569649169136047" />
+</testsuite>

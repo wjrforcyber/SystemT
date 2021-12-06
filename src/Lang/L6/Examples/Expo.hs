@@ -39,7 +39,7 @@ expoProp :: Property
 expoProp = property $
   -- forAll (arbitrary `suchThat` (<= 5)) $ \n m ->
   QC.withMaxSuccess 5 $ \n m ->
-    toNat (eval $ EApp (EApp expoExp (fromNat n)) (fromNat m)) === Just (expoHs n m)
+    toNat (evalStar $ EApp (EApp expoExp (fromNat n)) (fromNat m)) === Just (expoHs n m)
 
 expoProg :: Program
 expoProg = Program "expo" expoTy expoExp expoProp

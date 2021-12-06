@@ -36,7 +36,7 @@ mulExp =
 -- | check that both versions agree
 mulProp :: QC.Property
 mulProp = QC.property $ \n m ->
-  toNat (eval $ EApp (EApp mulExp (fromNat n)) (fromNat m)) === Just (mulHs n m)
+  toNat (evalStar $ EApp (EApp mulExp (fromNat n)) (fromNat m)) === Just (mulHs n m)
 
 mulProg :: Program
 mulProg = Program "mul" mulTy addExp mulProp

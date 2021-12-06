@@ -58,7 +58,7 @@ fibExp =
 fibProp :: Property
 fibProp = property $
   forAll (arbitrary `suchThat` (<= 10)) $ \n ->
-    toNat (eval $ EApp fibExp (fromNat n)) === Just (fibHs n)
+    toNat (evalStar $ EApp fibExp (fromNat n)) === Just (fibHs n)
 
 fibProg :: Program
 fibProg = Program "fib" fibTy fibExp fibProp

@@ -47,7 +47,7 @@ facExp =
 facProp :: QC.Property
 facProp = QC.property $
   forAll (arbitrary `suchThat` (<= 5)) $ \n ->
-    toNat (eval $ EApp facExp (fromNat n)) === Just (facHs n)
+    toNat (evalStar $ EApp facExp (fromNat n)) === Just (facHs n)
 
 facProg :: Program
 facProg = Program "fac" facTy facExp facProp

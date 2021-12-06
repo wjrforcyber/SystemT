@@ -40,7 +40,7 @@ tetProp = QC.property $
   -- QC.withMaxSuccess 5 $
     forAll (arbitrary `suchThat` (<= 3)) $
       \a n ->
-        toNat (eval $ EApp (EApp tetExp (fromNat a)) (fromNat n)) === Just (tetHs a n)
+        toNat (evalStar $ EApp (EApp tetExp (fromNat a)) (fromNat n)) === Just (tetHs a n)
 
 tetProg :: Program
 tetProg = Program "tet" tetTy tetExp tetProp

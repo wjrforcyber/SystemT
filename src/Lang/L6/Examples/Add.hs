@@ -39,7 +39,7 @@ addExp =
 -- | check that both versions agree
 addProp :: QC.Property
 addProp = QC.property $ \n m ->
-  toNat (eval $ EApp (EApp addExp (fromNat n)) (fromNat m)) === Just (addHs n m)
+  toNat (evalStar $ EApp (EApp addExp (fromNat n)) (fromNat m)) === Just (addHs n m)
 
 addProg :: Program
 addProg = Program "add" addTy addExp addProp

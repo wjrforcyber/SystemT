@@ -32,7 +32,7 @@ isZeroExp =
 -- | check that both versions agree
 isZeroProp :: QC.Property
 isZeroProp = QC.property $ \n ->
-  toBool (eval $ EApp isZeroExp (fromNat n)) === Just (isZeroHs n)
+  toBool (evalStar $ EApp isZeroExp (fromNat n)) === Just (isZeroHs n)
 
 isZeroProg :: Program
 isZeroProg = Program "isZero" isZeroTy isZeroExp isZeroProp

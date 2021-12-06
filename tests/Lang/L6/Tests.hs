@@ -4,11 +4,12 @@
 
 module Lang.L6.Tests (unitTests, propertyTests, exampleTests) where
 
-import Lang.L6.Eval.EEval as EE
 -- import Lang.L5.Eval.IEval as I
 
 -- import Lang.L5.Syntax.Intrinsic as I
 
+import Data.Maybe
+import Lang.L6.Eval.EEval as EE
 import Lang.L6.Examples
 import Lang.L6.Syntax.Extrinsic as E
 import Lang.L6.Typecheck
@@ -49,28 +50,50 @@ evalL6Props :: TestTree
 evalL6Props =
   testGroup
     "eval"
-    [ QC.testProperty "Progress: Type-inferable expressions always reduce to a value" $
+    [ QC.testProperty "*Progress: Type-inferable expressions always reduce to a value" $
         QC.withMaxSuccess 1_000_000 $ -- test 1 million times
           QC.within 5_000_000 $ -- timeout after 5s
             \(e :: TcTyExp) ->
-              EE.isVal (EE.eval (tcgetExp e)),
+              EE.isVal (EE.evalStar (tcgetExp e)),
+      QC.testProperty "*Type-preservation: Type-inferable expressions reduce to a value of the same type" $
+        QC.withMaxSuccess 1_000_000 $ -- test 1 million times
+          QC.within 5_000_000 $ -- timeout after 5s
+            \(e :: TcTyExp) ->
+              case runTC (tcinfer (tcgetExp e)) E.Emp of
+                Right ty -> tcisSuccess $ tccheck (EE.evalStar (tcgetExp e)) ty
+                Left _ -> error $ "This cannot happen because" ++ show e ++ " is well-typed",
+      QC.testProperty "*Progress: Well-typed expressions always reduce to a value" $
+        QC.withMaxSuccess 1_000_000 $ -- test 1 million times
+          QC.within 5_000_000 $ -- timeout after 5s
+            \(e :: TyExp) ->
+              EE.isVal (EE.evalStar (getExp e)),
+      QC.testProperty "*Type-preservation: Well-typed expressions reduce to a value of the same type" $
+        QC.withMaxSuccess 1_000_000 $ -- test 1 million times
+          QC.within 5_000_000 $ -- timeout after 5s
+            \(e :: TyExp) ->
+              tcisSuccess (tccheck (EE.evalStar (getExp e)) (getTy e)),
+      QC.testProperty "Progress: Type-inferable expressions always reduce to a value" $
+        QC.withMaxSuccess 1_000_000 $ -- test 1 million times
+          QC.within 5_000_000 $ -- timeout after 5s
+            \(e :: TcTyExp) ->
+              isJust $ EE.runEval (EE.eval (tcgetExp e)) EE.Emp,
       QC.testProperty "Type-preservation: Type-inferable expressions reduce to a value of the same type" $
         QC.withMaxSuccess 1_000_000 $ -- test 1 million times
           QC.within 5_000_000 $ -- timeout after 5s
             \(e :: TcTyExp) ->
               case runTC (tcinfer (tcgetExp e)) E.Emp of
-                Right ty -> tcisSuccess $ tccheck (EE.eval (tcgetExp e)) ty
+                Right ty -> tcisSuccess $ tccheck (tcgetExp e) ty
                 Left _ -> error $ "This cannot happen because" ++ show e ++ " is well-typed",
       QC.testProperty "Progress: Well-typed expressions always reduce to a value" $
         QC.withMaxSuccess 1_000_000 $ -- test 1 million times
           QC.within 5_000_000 $ -- timeout after 5s
             \(e :: TyExp) ->
-              EE.isVal (EE.eval (getExp e)),
+              isJust $ EE.runEval (EE.eval (getExp e)) EE.Emp,
       QC.testProperty "Type-preservation: Well-typed expressions reduce to a value of the same type" $
         QC.withMaxSuccess 1_000_000 $ -- test 1 million times
           QC.within 5_000_000 $ -- timeout after 5s
             \(e :: TyExp) ->
-              tcisSuccess (tccheck (EE.eval (getExp e)) (getTy e))
+              tcisSuccess (tccheck (getExp e) (getTy e))
     ]
 
 unitTests :: TestTree
@@ -107,4 +130,4 @@ exampleTest Program {..} =
 
 exampleTests :: TestTree
 exampleTests =
-  testGroup "L6" $ map exampleTest [isZeroProg, predProg, addProg, fibProg, mulProg, expoProg, tetProg, ackerProg, facProg, doubleProg ]
+  testGroup "L6" $ map exampleTest [isZeroProg, predProg, addProg, fibProg, mulProg, expoProg, tetProg, ackerProg, facProg, doubleProg]

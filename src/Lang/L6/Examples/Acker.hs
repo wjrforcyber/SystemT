@@ -17,26 +17,81 @@ ackerHs (Succ m) (Succ n) = ackerHs m (ackerHs (Succ m) n)
 
 -- | type of tet in L6
 ackerTy :: Ty
+-- ackerTy = TFun (TFun TNat TNat) TNat
+
 ackerTy = TFun TNat (TFun TNat TNat)
+
+compExp :: Exp
+compExp =
+  ELam
+    "t"
+    (TProd (TFun TNat TNat) (TFun TNat TNat))
+    ( ELam
+        "x"
+        TNat
+        ( ESnd (EApp (EFst (EVar "t")) (EVar "x"))
+        )
+    )
+
+itExp :: Exp
+itExp =
+  ELam
+    "nat_func"
+    (TFun TNat TNat)
+    ( ELam
+        "nat_n"
+        TNat
+        ( ERec
+            ( ELam
+                "x"
+                TNat
+                (EVar "x")
+            )
+            ( ELam
+                "nat_func_g"
+                (TFun TNat TNat)
+                (EApp (EApp compExp (EVar "nat_func")) (EVar "nat_func_g"))
+            )
+            (EVar "nat_n")
+        )
+    )
 
 ackerExp :: Exp
 ackerExp =
   ELam
     "nat_m"
     TNat
-    ( ERec
-        (ESucc (EVar "nat_n"))
-        ( ELam
-            "nat_n"
-            TNat
-            ( ERec
-                (EApp (EApp ackerExp (EApp predExp (EVar "nat_m"))) (ESucc EZero))
-                (EApp (EApp ackerExp (EApp predExp (EVar "nat_m"))) (EApp (EApp ackerExp (EVar "nat_m")) (EApp predExp (EVar "nat_n"))))
-                (EVar "nat_n")
+    ( ELam
+        "nat_n"
+        TNat
+        ( ERec
+            (ESucc (EVar "nat_n"))
+            ( ESucc
+                ( EApp (EApp (EApp itExp ackerExp) (EVar "nat_n")) (EApp itExp (fromNat 1))
+                )
             )
+            (EVar "nat_m")
         )
-        (EVar "nat_m")
     )
+
+-- ackerExp :: Exp
+-- ackerExp =
+--   ELam
+--     "nat_m"
+--     TNat
+--     ( ERec
+--         (ESucc (EVar "nat_n"))
+--         ( ELam
+--             "nat_n"
+--             TNat
+--             ( ERec
+--                 (EApp (EApp ackerExp (EApp predExp (EVar "nat_m"))) (ESucc EZero))
+--                 (EApp (EApp ackerExp (EApp predExp (EVar "nat_m"))) (EApp (EApp ackerExp (EVar "nat_m")) (EApp predExp (EVar "nat_n"))))
+--                 (EVar "nat_n")
+--             )
+--         )
+--         (EVar "nat_m")
+--     )
 
 -- | check that both versions agree
 ackerProp :: QC.Property
@@ -44,7 +99,7 @@ ackerProp = QC.property $
   -- QC.withMaxSuccess 5 $
   forAll (arbitrary `suchThat` (<= 2)) $
     \m n ->
-      toNat (eval $ EApp (EApp ackerExp (fromNat m)) (fromNat n)) === Just (ackerHs m n)
+      toNat (evalStar $ EApp (EApp ackerExp (fromNat n)) (fromNat m)) === Just (ackerHs n m)
 
 ackerProg :: Program
 ackerProg = Program "acker" ackerTy ackerExp ackerProp

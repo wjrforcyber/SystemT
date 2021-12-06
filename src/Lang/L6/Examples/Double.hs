@@ -36,7 +36,7 @@ doubleExp =
 -- | check that both versions agree
 doubleProp :: QC.Property
 doubleProp = QC.property $ \n ->
-  toNat (eval $ EApp doubleExp (fromNat n)) === Just (doubleHs n)
+  toNat (evalStar $ EApp doubleExp (fromNat n)) === Just (doubleHs n)
 
 doubleProg :: Program
 doubleProg = Program "double" doubleTy doubleExp doubleProp
