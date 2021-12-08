@@ -48,7 +48,9 @@ library
         Lang.L5.Typecheck
         Lang.L5.Eval.EEval
         Lang.L6.Syntax.Extrinsic
+        Lang.L6.Syntax.Intrinsic
         Lang.L6.Eval.EEval
+        Lang.L6.Eval.IEval
         Lang.L6.Typecheck
         Lang.L6.Examples
         Lang.L6.Examples.Base

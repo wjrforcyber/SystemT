@@ -10,8 +10,10 @@ module Lang.L6.Tests (unitTests, propertyTests, exampleTests) where
 
 import Data.Maybe
 import Lang.L6.Eval.EEval as EE
+-- import Lang.L6.Eval.IEval as IE
 import Lang.L6.Examples
 import Lang.L6.Syntax.Extrinsic as E
+-- import Lang.L6.Syntax.Intrinsic as I
 import Lang.L6.Typecheck
 import Test.Tasty
 import Test.Tasty.HUnit
@@ -26,7 +28,7 @@ tcL6Props =
     "Bidi-typecheck"
     [ QC.testProperty "every generated expression is well-scoped" $
         QC.withMaxSuccess 1_000_000 $ -- test 1 million times
-          \(e :: Exp) ->
+          \(e :: E.Exp) ->
             fv e === [],
       QC.testProperty "every inferable expression can be inferred" $
         QC.withMaxSuccess 1_000_000 $ -- test 1 million times
@@ -104,9 +106,11 @@ unitL6Tests =
   testGroup
     "L6"
     [ testCase "Unit on L6 check on Lambda" $
-        tcisSuccess (tccheck (ELam (Name "x") TBool (EIf (EVar (Name "x")) (ESucc EZero) EZero)) (TFun TBool TNat)) @?= True,
+        tcisSuccess (tccheck (E.ELam (E.Name "x") E.TBool (E.EIf (E.EVar (E.Name "x")) (E.ESucc E.EZero) E.EZero)) (E.TFun E.TBool E.TNat)) @?= True,
       testCase "Unit on L6 infer on Lambda" $
-        runTC (tcinfer (ELam (Name "x") TBool (EIf (EVar (Name "x")) (ESucc EZero) EZero))) E.Emp @?= Right (TFun TBool TNat)
+        runTC (tcinfer (E.ELam (E.Name "x") E.TBool (E.EIf (E.EVar (E.Name "x")) (E.ESucc E.EZero) E.EZero))) E.Emp @?= Right (E.TFun E.TBool E.TNat)
+      -- testCase "Unit on L6 0" $
+      --   IE.eval (I.EIf I.ETrue (I.ESucc I.EZero) (I.ESucc (I.ESucc I.EZero))) @?= I.VSucc I.VZero
         {- testCase "Unit on L6 1" $
           EE.runEval (EE.eval (EApp (ELam (Name "x") TBool (EIf (EVar (Name "x")) (ESucc EZero) EZero)) ETrue)) EE.Emp @?= Just (VSuccN 1),
         testCase "Unit on L6 2" $

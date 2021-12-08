@@ -5,7 +5,6 @@ module Lang.L6.Examples.Acker where
 
 import Lang.L6.Eval.EEval
 import Lang.L6.Examples.Base
-import Lang.L6.Examples.Pred (predExp)
 import Test.QuickCheck (Arbitrary (arbitrary), forAll, suchThat, (===))
 import qualified Test.QuickCheck as QC
 
@@ -29,14 +28,13 @@ compExp =
     ( ELam
         "x"
         TNat
-        ( ESnd (EApp (EFst (EVar "t")) (EVar "x"))
-        )
+        (EApp (EFst (EVar "t")) (EApp (ESnd (EVar "t")) (EVar "x")))
     )
 
 itExp :: Exp
 itExp =
   ELam
-    "nat_func"
+    "nat_func_f"
     (TFun TNat TNat)
     ( ELam
         "nat_n"
@@ -50,29 +48,59 @@ itExp =
             ( ELam
                 "nat_func_g"
                 (TFun TNat TNat)
-                (EApp (EApp compExp (EVar "nat_func")) (EVar "nat_func_g"))
+                (EApp compExp (ETuple (EVar "nat_func_f")(EVar "nat_func_g")))
             )
             (EVar "nat_n")
+        )
+    )
+
+sExp :: Exp
+sExp =
+  ELam
+    "m"
+    TNat
+    (ESucc (EVar "m"))
+
+rExp :: Exp
+rExp =
+  ELam
+    "f"
+    (TFun TNat TNat)
+    ( ELam
+        "m"
+        TNat
+        ( EApp (EApp (EApp itExp (EVar "f")) (EVar "m")) (EApp (EVar "f") (ESucc EZero))
         )
     )
 
 ackerExp :: Exp
 ackerExp =
   ELam
-    "nat_m"
+    "n"
     TNat
-    ( ELam
-        "nat_n"
-        TNat
-        ( ERec
-            (ESucc (EVar "nat_n"))
-            ( ESucc
-                ( EApp (EApp (EApp itExp ackerExp) (EVar "nat_n")) (EApp itExp (fromNat 1))
-                )
-            )
-            (EVar "nat_m")
-        )
+    ( ERec
+        (sExp)
+        (rExp)
+        (EVar "n")
     )
+
+-- ackerExp :: Exp
+-- ackerExp =
+--   ELam
+--     "nat_m"
+--     TNat
+--     ( ELam
+--         "nat_n"
+--         TNat
+--         ( ERec
+--             (ESucc (EVar "nat_n"))
+--             ( ESucc
+--                 ( EApp (EApp (EApp itExp ackerExp) (EVar "nat_n")) (EApp itExp (fromNat 1))
+--                 )
+--             )
+--             (EVar "nat_m")
+--         )
+--     )
 
 -- ackerExp :: Exp
 -- ackerExp =
@@ -96,7 +124,7 @@ ackerExp =
 -- | check that both versions agree
 ackerProp :: QC.Property
 ackerProp = QC.property $
-  -- QC.withMaxSuccess 5 $
+  QC.withMaxSuccess 10 $
   forAll (arbitrary `suchThat` (<= 2)) $
     \m n ->
       toNat (evalStar $ EApp (EApp ackerExp (fromNat n)) (fromNat m)) === Just (ackerHs n m)
