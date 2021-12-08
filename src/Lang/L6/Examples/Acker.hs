@@ -5,7 +5,7 @@ module Lang.L6.Examples.Acker where
 
 import Lang.L6.Eval.EEval
 import Lang.L6.Examples.Base
-import Test.QuickCheck (Arbitrary (arbitrary), forAll, suchThat, (===))
+import Test.QuickCheck (forAll, (===))
 import qualified Test.QuickCheck as QC
 
 -- | Tetration in Haskell
@@ -48,7 +48,7 @@ itExp =
             ( ELam
                 "nat_func_g"
                 (TFun TNat TNat)
-                (EApp compExp (ETuple (EVar "nat_func_f")(EVar "nat_func_g")))
+                (EApp compExp (ETuple (EVar "nat_func_f") (EVar "nat_func_g")))
             )
             (EVar "nat_n")
         )
@@ -125,9 +125,9 @@ ackerExp =
 ackerProp :: QC.Property
 ackerProp = QC.property $
   QC.withMaxSuccess 10 $
-  forAll (arbitrary `suchThat` (<= 2)) $
-    \m n ->
-      toNat (evalStar $ EApp (EApp ackerExp (fromNat n)) (fromNat m)) === Just (ackerHs n m)
+    forAll (QC.elements [0, 1, 2, 3]) $ \n ->
+      forAll (QC.elements [0, 1, 2, 3, 4]) $ \m ->
+        toNat (evalStar $ EApp (EApp ackerExp (fromNat n)) (fromNat m)) === Just (ackerHs n m)
 
 ackerProg :: Program
 ackerProg = Program "acker" ackerTy ackerExp ackerProp

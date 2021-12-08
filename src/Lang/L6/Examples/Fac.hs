@@ -6,7 +6,7 @@ module Lang.L6.Examples.Fac where
 import Lang.L6.Eval.EEval
 import Lang.L6.Examples.Base
 import Lang.L6.Examples.Mul (mulExp)
-import Test.QuickCheck (Arbitrary (arbitrary), forAll, suchThat, (===))
+import Test.QuickCheck (forAll, (===))
 import qualified Test.QuickCheck as QC
 
 -- | mul in Haskell
@@ -46,7 +46,7 @@ facExp =
 -- | check that both versions agree
 facProp :: QC.Property
 facProp = QC.property $
-  forAll (arbitrary `suchThat` (<= 5)) $ \n ->
+  forAll (QC.elements [0, 1, 2, 3, 4, 5]) $ \n ->
     toNat (evalStar $ EApp facExp (fromNat n)) === Just (facHs n)
 
 facProg :: Program
