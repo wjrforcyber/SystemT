@@ -84,50 +84,12 @@ ackerExp =
         (EVar "n")
     )
 
--- ackerExp :: Exp
--- ackerExp =
---   ELam
---     "nat_m"
---     TNat
---     ( ELam
---         "nat_n"
---         TNat
---         ( ERec
---             (ESucc (EVar "nat_n"))
---             ( ESucc
---                 ( EApp (EApp (EApp itExp ackerExp) (EVar "nat_n")) (EApp itExp (fromNat 1))
---                 )
---             )
---             (EVar "nat_m")
---         )
---     )
-
--- ackerExp :: Exp
--- ackerExp =
---   ELam
---     "nat_m"
---     TNat
---     ( ERec
---         (ESucc (EVar "nat_n"))
---         ( ELam
---             "nat_n"
---             TNat
---             ( ERec
---                 (EApp (EApp ackerExp (EApp predExp (EVar "nat_m"))) (ESucc EZero))
---                 (EApp (EApp ackerExp (EApp predExp (EVar "nat_m"))) (EApp (EApp ackerExp (EVar "nat_m")) (EApp predExp (EVar "nat_n"))))
---                 (EVar "nat_n")
---             )
---         )
---         (EVar "nat_m")
---     )
-
 -- | check that both versions agree
 ackerProp :: QC.Property
 ackerProp = QC.property $
-  QC.withMaxSuccess 10 $
-    forAll (QC.elements [0, 1, 2, 3]) $ \n ->
-      forAll (QC.elements [0, 1, 2, 3, 4]) $ \m ->
-        toNat (evalStar $ EApp (EApp ackerExp (fromNat n)) (fromNat m)) === Just (ackerHs n m)
+  forAll (QC.elements [0, 1, 2, 3]) $ \n ->
+    forAll (QC.elements [0, 1, 2, 3, 4]) $ \m ->
+      toNat (evalStar $ EApp (EApp ackerExp (fromNat n)) (fromNat m)) === Just (ackerHs n m)
 
 ackerProg :: Program
 ackerProg = Program "acker" ackerTy ackerExp ackerProp

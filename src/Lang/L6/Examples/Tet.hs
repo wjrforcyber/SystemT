@@ -6,7 +6,9 @@ module Lang.L6.Examples.Tet where
 import Lang.L6.Eval.EEval
 import Lang.L6.Examples.Base
 import Lang.L6.Examples.Expo (expoExp, expoHs)
-import Test.QuickCheck (Arbitrary (arbitrary), forAll, suchThat, (===))
+-- import Test.QuickCheck (Arbitrary (arbitrary), forAll, suchThat, (===))
+
+import Test.QuickCheck (forAll, (===))
 import qualified Test.QuickCheck as QC
 
 -- | Tetration in Haskell
@@ -37,10 +39,9 @@ tetExp =
 -- | check that both versions agree
 tetProp :: QC.Property
 tetProp = QC.property $
-  -- QC.withMaxSuccess 5 $
-    forAll (arbitrary `suchThat` (<= 3)) $
-      \a n ->
-        toNat (evalStar $ EApp (EApp tetExp (fromNat a)) (fromNat n)) === Just (tetHs a n)
+  forAll (QC.elements [0, 1, 2]) $ \a ->
+    forAll (QC.elements [0, 1, 2, 3]) $ \n ->
+      toNat (evalStar $ EApp (EApp tetExp (fromNat a)) (fromNat n)) === Just (tetHs a n)
 
 tetProg :: Program
 tetProg = Program "tet" tetTy tetExp tetProp
