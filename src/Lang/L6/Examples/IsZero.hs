@@ -23,7 +23,7 @@ isZeroExp =
   ELam
     "n"
     TNat
-    ( ERec
+    ( EIter
         ETrue
         (ELam "b" TBool EFalse)
         (EVar "n")

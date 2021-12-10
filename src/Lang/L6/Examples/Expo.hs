@@ -27,7 +27,7 @@ expoExp =
     ( ELam
         "nat_m"
         TNat
-        ( ERec
+        ( EIter
             (ESucc EZero)
             (EApp mulExp (EVar "nat_n"))
             (EVar "nat_m")

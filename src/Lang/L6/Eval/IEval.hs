@@ -6,7 +6,7 @@ import Lang.L6.Syntax.Intrinsic
 eval :: Exp 'Emp ty -> Val ty
 eval EZero = VZero
 eval (ESucc e) = VSucc (eval e)
-eval (ERec e1 _ e3) =
+eval (EIter e1 _ e3) =
   case eval e3 of
     VZero -> eval e1
     VSucc _ -> error "succ"

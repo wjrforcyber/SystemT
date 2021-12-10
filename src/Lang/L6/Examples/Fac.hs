@@ -23,7 +23,7 @@ facExp2 =
   ELam
     "fac_n"
     TNat
-    ( ERec
+    ( EIter
         (ETuple EZero (ESucc EZero))
         ( ELam
             "fac_t"

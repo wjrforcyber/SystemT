@@ -29,7 +29,7 @@ tetExp =
     ( ELam
         "nat_n"
         TNat
-        ( ERec
+        ( EIter
             (ESucc EZero)
             (EApp expoExp (EVar "nat_a"))
             (EVar "nat_n")

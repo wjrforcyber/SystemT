@@ -24,7 +24,7 @@ predExp =
     "n"
     TNat
     ( EFst
-        ( ERec
+        ( EIter
             (ETuple EZero EZero)
             ( ELam
                 "t"

@@ -22,7 +22,7 @@ fibTy = TFun TNat TNat
 -- fibExp :: Exp -> Exp
 -- fibExp EZero = EZero
 -- fibExp (ESucc EZero) = (ESucc EZero)
--- fibExp (ESucc (ESucc e)) = ERec(fibExp e, ,ESucc e )
+-- fibExp (ESucc (ESucc e)) = EIter(fibExp e, ,ESucc e )
 
 --TODO
 
@@ -31,7 +31,7 @@ fibExp2 =
   ELam
     "fib_n"
     TNat
-    ( ERec
+    ( EIter
         (ETuple EZero (ESucc EZero))
         ( ELam
             "fib_t"

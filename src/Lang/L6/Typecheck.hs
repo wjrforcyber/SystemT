@@ -126,7 +126,7 @@ tccheck (EApp e1 e2) ty =
     if ty2 == ty
       then return ()
       else tcfail ("check: the type of " ++ show (EApp e1 e2) ++ "is " ++ show ty2 ++ ", not " ++ show ty)
-tccheck (ERec e1 e2 e3) ty =
+tccheck (EIter e1 e2 e3) ty =
   do
     _ <- tccheck e1 ty
     _ <- tccheck e2 (TFun ty ty)
@@ -182,7 +182,7 @@ tcinfer (EApp e1 e2) =
     TFun ty1 ty2 <- tcinfer e1
     _ <- tccheck e2 ty1
     return ty2
-tcinfer (ERec e1 e2 e3) =
+tcinfer (EIter e1 e2 e3) =
   do
     ty1 <- tcinfer e1
     _ <- tccheck e2 (TFun ty1 ty1)
@@ -202,4 +202,4 @@ fv (ESnd e) = fv e
 fv (EVar x) = [x]
 fv (ELam x _ e) = [y | y <- fv e, y /= x]
 fv (EApp e1 e2) = fv e1 ++ fv e2
-fv (ERec e1 e2 e3) = fv e1 ++ fv e2 ++ fv e3
+fv (EIter e1 e2 e3) = fv e1 ++ fv e2 ++ fv e3

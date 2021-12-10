@@ -46,11 +46,11 @@ eval EZero =
   pure EZero
 eval (ESucc e) =
   ESucc <$> eval e
-eval (ERec e1 e2 e3) =
+eval (EIter e1 e2 e3) =
   eval e3 >>= \case
     EZero -> eval e1
-    (ESucc e3') -> eval (EApp e2 (ERec e1 e2 e3'))
-    _ -> fail "eval: ERec: invalid argument"
+    (ESucc e3') -> eval (EApp e2 (EIter e1 e2 e3'))
+    _ -> fail "eval: EIter: invalid argument"
 eval ETrue =
   pure ETrue
 eval EFalse =
@@ -98,7 +98,7 @@ subst x e (EFst e') = EFst (subst x e e')
 subst x e (ESnd e') = ESnd (subst x e e')
 subst x e (EIf e1 e2 e3) = EIf (subst x e e1) (subst x e e2) (subst x e e3)
 subst x e (ESucc e') = ESucc (subst x e e')
-subst x e (ERec e1 e2 e3) = ERec (subst x e e1) (subst x e e2) (subst x e e3)
+subst x e (EIter e1 e2 e3) = EIter (subst x e e1) (subst x e e2) (subst x e e3)
 subst _ _ e = e
 
 evalStep :: Exp -> Maybe Exp
@@ -121,10 +121,10 @@ evalStep (EApp e1 e2)
   | isVal e1 = EApp <$> pure e1 <*> evalStep e2
   | otherwise = EApp <$> evalStep e1 <*> pure e2
 -- naturals
-evalStep (ERec e1 _ EZero) =
+evalStep (EIter e1 _ EZero) =
   pure e1
-evalStep (ERec e1 e2 (ESucc e3)) =
-  pure $ EApp e2 (ERec e1 e2 e3)
+evalStep (EIter e1 e2 (ESucc e3)) =
+  pure $ EApp e2 (EIter e1 e2 e3)
 -- congruence rules
 -- booleans
 evalStep (EIf e1 e2 e3) =
@@ -146,8 +146,8 @@ evalStep (ETuple e1 e2)
 evalStep (ESucc e)
   | isVal e = Nothing
   | otherwise = ESucc <$> evalStep e
-evalStep (ERec e1 e2 e3) =
-  ERec <$> pure e1 <*> pure e2 <*> evalStep e3
+evalStep (EIter e1 e2 e3) =
+  EIter <$> pure e1 <*> pure e2 <*> evalStep e3
 evalStep _ =
   Nothing
 

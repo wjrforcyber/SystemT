@@ -35,7 +35,7 @@ data In :: Ctx -> Bind -> Type where
 data Exp :: Ctx -> Ty -> Type where
   EZero :: Exp ctx 'TNat
   ESucc :: Exp ctx 'TNat -> Exp ctx 'TNat
-  ERec :: Exp ctx ty -> Exp ctx ('TFun ty ty) -> Exp ctx 'TNat -> Exp ctx ty
+  EIter :: Exp ctx ty -> Exp ctx ('TFun ty ty) -> Exp ctx 'TNat -> Exp ctx ty
   ETrue :: Exp ctx 'TBool
   EFalse :: Exp ctx 'TBool
   EIf :: Exp ctx 'TBool -> Exp ctx ty -> Exp ctx ty -> Exp ctx ty

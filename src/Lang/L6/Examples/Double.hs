@@ -23,7 +23,7 @@ doubleExp =
   ELam
     "nat_n"
     TNat
-    ( ERec
+    ( EIter
         (EVar "nat_n")
         ( ELam
             "nat_t"

@@ -26,7 +26,7 @@ mulExp =
     ( ELam
         "nat_m"
         TNat
-        ( ERec
+        ( EIter
             EZero
             (EApp addExp (EVar "nat_m"))
             (EVar "nat_n")

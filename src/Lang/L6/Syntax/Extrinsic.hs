@@ -52,7 +52,7 @@ data Exp
   | EVar Name --variables
   | ELam Name Ty Exp --abstraction
   | EApp Exp Exp --application
-  | ERec Exp Exp Exp
+  | EIter Exp Exp Exp
   deriving (Eq, Generic, NFData)
 
 instance Arbitrary Ty where
@@ -94,7 +94,7 @@ synthElim n ctx ty =
         arbitrary >>= \ty' -> ESnd <$> synth (TProd ty' ty),
         arbitrary >>= \ty' -> EApp <$> synth (TFun ty' ty) <*> synth ty',
         EIf <$> synth TBool <*> synth ty <*> synth ty,
-        ERec <$> synth ty <*> synth (TFun ty ty) <*> synth TNat
+        EIter <$> synth ty <*> synth (TFun ty ty) <*> synth TNat
       ]
 
 synthAux :: (Ctx -> Ty -> Gen Exp) -> Ctx -> Ty -> [Gen Exp]
@@ -140,7 +140,7 @@ arbExpCtx n ctx = do
   let subExp = arbExpCtx (n `div` (m + 1)) ctx
   oneof $
     [ ESucc <$> subExp,
-      ERec <$> subExp <*> subExp <*> subExp,
+      EIter <$> subExp <*> subExp <*> subExp,
       EIf <$> subExp <*> subExp <*> subExp,
       ETuple <$> subExp <*> subExp,
       EFst <$> subExp,
@@ -193,4 +193,4 @@ prettyExp (ESnd e) = PP.pretty "snd" <> PP.pretty "(" <> prettyExp e <> PP.prett
 prettyExp (EVar x) = PP.pretty x
 prettyExp (ELam x ty e) = PP.pretty "(λ(" <> PP.pretty x <+> PP.pretty ":" <+> prettyTy ty <> PP.pretty ")." <+> prettyExp e <> PP.pretty ")"
 prettyExp (EApp e1 e2) = PP.pretty "(" <> prettyExp e1 <+> prettyExp e2 <> PP.pretty ")"
-prettyExp (ERec e1 e2 e3) = PP.pretty "rec(" <> prettyExp e1 <> PP.pretty "," <+> prettyExp e2 <> PP.pretty "," <+> prettyExp e3 <> PP.pretty ")"
+prettyExp (EIter e1 e2 e3) = PP.pretty "Iter(" <> prettyExp e1 <> PP.pretty "," <+> prettyExp e2 <> PP.pretty "," <+> prettyExp e3 <> PP.pretty ")"

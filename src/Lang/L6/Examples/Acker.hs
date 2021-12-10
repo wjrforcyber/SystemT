@@ -39,7 +39,7 @@ itExp =
     ( ELam
         "nat_n"
         TNat
-        ( ERec
+        ( EIter
             ( ELam
                 "x"
                 TNat
@@ -78,7 +78,7 @@ ackerExp =
   ELam
     "n"
     TNat
-    ( ERec
+    ( EIter
         sExp
         rExp
         (EVar "n")

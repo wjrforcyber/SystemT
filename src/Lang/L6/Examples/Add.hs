@@ -25,7 +25,7 @@ addExp =
     ( ELam
         "nat_m"
         TNat
-        ( ERec
+        ( EIter
             (EVar "nat_m")
             ( ELam
                 "nat_t"
