@@ -25,3 +25,4 @@ cabal.project.local~
 .xml
 .csv
 travis.yml
+.travis.yml
