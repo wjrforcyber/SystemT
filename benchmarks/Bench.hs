@@ -18,6 +18,7 @@ import Lang.L6.Examples.IsZero as L6
 import Lang.L6.Examples.Mul as L6
 import Lang.L6.Examples.Pred as L6
 import Lang.L6.Examples.Tet as L6
+import Lang.L6.Examples.Acker as L6
 
 setupEnv :: IO (L1.Exp, L1.Exp, L1.Exp)
 setupEnv = do
@@ -89,6 +90,12 @@ main =
         [ bench "tetHs" $ nf (L6.tetHs 2) 3,
           bench "*tetExp" $ nf LL6.evalStar (L6.EApp (L6.EApp tetExp (L6.fromNat 2)) (L6.fromNat 3)),
           bench "tetExp" $ nf (LL6.runEval (LL6.eval (L6.EApp (L6.EApp tetExp (L6.fromNat 2)) (L6.fromNat 3)))) LL6.Emp
+        ],
+      bgroup
+        "acker"
+        [ bench "ackerHs" $ nf (L6.tetHs 2) 3,
+          bench "*ackerExp" $ nf LL6.evalStar (L6.EApp (L6.EApp ackerExp (L6.fromNat 2)) (L6.fromNat 3)),
+          bench "ackerExp" $ nf (LL6.runEval (LL6.eval (L6.EApp (L6.EApp ackerExp (L6.fromNat 2)) (L6.fromNat 3)))) LL6.Emp
         ],
       bgroup
         "Add in L5 VS Add in L6"

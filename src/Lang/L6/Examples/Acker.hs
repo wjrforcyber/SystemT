@@ -79,8 +79,8 @@ ackerExp =
     "n"
     TNat
     ( ERec
-        (sExp)
-        (rExp)
+        sExp
+        rExp
         (EVar "n")
     )
 

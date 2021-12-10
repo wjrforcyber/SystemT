@@ -4,10 +4,6 @@
 
 module Lang.L6.Tests (unitTests, propertyTests, exampleTests) where
 
--- import Lang.L5.Eval.IEval as I
-
--- import Lang.L5.Syntax.Intrinsic as I
-
 import Data.Maybe
 import Lang.L6.Eval.EEval as EE
 -- import Lang.L6.Eval.IEval as IE
@@ -109,8 +105,8 @@ unitL6Tests =
         tcisSuccess (tccheck (E.ELam (E.Name "x") E.TBool (E.EIf (E.EVar (E.Name "x")) (E.ESucc E.EZero) E.EZero)) (E.TFun E.TBool E.TNat)) @?= True,
       testCase "Unit on L6 infer on Lambda" $
         runTC (tcinfer (E.ELam (E.Name "x") E.TBool (E.EIf (E.EVar (E.Name "x")) (E.ESucc E.EZero) E.EZero))) E.Emp @?= Right (E.TFun E.TBool E.TNat)
-      -- testCase "Unit on L6 0" $
-      --   IE.eval (I.EIf I.ETrue (I.ESucc I.EZero) (I.ESucc (I.ESucc I.EZero))) @?= I.VSucc I.VZero
+        -- testCase "Unit on L6 0" $
+        --   IE.eval (I.EIf I.ETrue (I.ESucc I.EZero) (I.ESucc (I.ESucc I.EZero))) @?= I.VSucc I.VZero
         {- testCase "Unit on L6 1" $
           EE.runEval (EE.eval (EApp (ELam (Name "x") TBool (EIf (EVar (Name "x")) (ESucc EZero) EZero)) ETrue)) EE.Emp @?= Just (VSuccN 1),
         testCase "Unit on L6 2" $
