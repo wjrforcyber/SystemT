@@ -15,11 +15,12 @@ common common-deps
     mtl >= 2.2,
     parsec >= 3.1.14.0,
     prettyprinter >= 1.7.1,
-    QuickCheck >= 2.14.2,
+    QuickCheck >= 2.14.2
   ghc-options:
     -Wall
     -Wextra
     -Werror
+    -O2
   other-modules:
     Paths_EpsilonX
 
@@ -46,6 +47,23 @@ library
         Lang.L5.Syntax.Extrinsic
         Lang.L5.Typecheck
         Lang.L5.Eval.EEval
+        Lang.L6.Syntax.Extrinsic
+        Lang.L6.Syntax.Intrinsic
+        Lang.L6.Eval.EEval
+        Lang.L6.Eval.IEval
+        Lang.L6.Typecheck
+        Lang.L6.Examples
+        Lang.L6.Examples.Base
+        Lang.L6.Examples.IsZero
+        Lang.L6.Examples.Pred
+        Lang.L6.Examples.Add
+        Lang.L6.Examples.Fib
+        Lang.L6.Examples.Mul
+        Lang.L6.Examples.Expo
+        Lang.L6.Examples.Tet
+        Lang.L6.Examples.Acker
+        Lang.L6.Examples.Fac
+        Lang.L6.Examples.Double
 
     other-modules:
     hs-source-dirs:   src
@@ -66,6 +84,7 @@ test-suite test
         Lang.L3.Tests
         Lang.L4.Tests
         Lang.L5.Tests
+        Lang.L6.Tests
     hs-source-dirs: tests
     ghc-options:    -threaded -with-rtsopts=-N
     build-depends:

@@ -1,0 +1,5 @@
+packages: .
+optimization: 2
+documentation: false
+tests: true
+benchmarks: true

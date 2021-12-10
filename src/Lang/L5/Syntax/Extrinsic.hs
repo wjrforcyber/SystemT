@@ -1,7 +1,15 @@
--- | This is the Syntax of L5.
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+
+-- | This is the Syntax of L6.
 module Lang.L5.Syntax.Extrinsic where
 
-import Common.Types
+import Common.Types (Nat)
+import Control.DeepSeq
+import Data.String
+import GHC.Generics
 import Prettyprinter ((<+>))
 import qualified Prettyprinter as PP
 import Prettyprinter.Render.String
@@ -13,12 +21,12 @@ data Ty
   | TUnit
   | TProd Ty Ty
   | TFun Ty Ty
-  deriving (Eq)
+  deriving (Eq, Generic, NFData)
 
 data Ctx
   = Emp
   | Snoc Ctx (Name, Ty)
-  deriving (Eq, Show)
+  deriving (Eq, Show, Generic, NFData)
 
 lookupCtx :: Name -> Ctx -> Maybe Ty
 lookupCtx _ Emp = Nothing
@@ -30,7 +38,7 @@ extendCtx :: Name -> Ty -> Ctx -> Ctx
 extendCtx x ty ctx = Snoc ctx (x, ty)
 
 newtype Name = Name String
-  deriving (Eq, Show)
+  deriving newtype (Eq, Show, IsString, NFData)
 
 data Exp
   = EZero
@@ -47,7 +55,7 @@ data Exp
   | EVar Name --variables
   | ELam Name Ty Exp --abstraction
   | EApp Exp Exp --application
-  deriving (Eq)
+  deriving (Eq, Generic, NFData)
 
 data Val
   = VSuccN Nat
@@ -56,7 +64,7 @@ data Val
   | VUnit
   | VTuple Val Val
   | VLam Name Ty Exp
-  deriving (Eq, Show)
+  deriving (Eq, Show, Generic, NFData)
 
 instance Arbitrary Ty where
   arbitrary =
@@ -74,29 +82,70 @@ instance Arbitrary Exp where
 instance Arbitrary Name where
   arbitrary = Name <$> elements (map (: []) ['a' .. 'z'])
 
-arbExp :: Int -> Gen Exp
-arbExp 0 =
+arbName :: Name -> Ctx -> Gen Name
+arbName x Emp = pure x
+arbName x (Snoc ctx' (y, _)) =
   oneof
-    [ pure EZero,
-      pure ETrue,
-      pure EFalse,
-      pure EUnit
+    [ pure x,
+      arbName y ctx'
     ]
-arbExp n = do
+
+arbExpCtx :: Int -> Ctx -> Gen Exp
+arbExpCtx 0 ctx =
+  case ctx of
+    Emp ->
+      elements
+        [ EZero,
+          ETrue,
+          EFalse,
+          EUnit
+        ]
+    Snoc ctx' (x, _) ->
+      oneof
+        [ pure EZero,
+          pure ETrue,
+          pure EFalse,
+          pure EUnit,
+          EVar <$> arbName x ctx'
+        ]
+arbExpCtx n ctx = do
   (Positive m) <- arbitrary
-  let subExp = arbExp (n `div` (m + 1))
-  oneof
-    [ ESucc <$> subExp,
-      EAdd <$> subExp <*> subExp,
-      EMul <$> subExp <*> subExp,
-      EIf <$> subExp <*> subExp <*> subExp,
-      ETuple <$> subExp <*> subExp,
-      EFst <$> subExp,
-      ESnd <$> subExp,
-      EVar <$> arbitrary,
-      ELam <$> arbitrary <*> arbitrary <*> subExp,
-      EApp <$> subExp <*> subExp
-    ]
+  let subExp = arbExpCtx (n `div` (m + 1)) ctx
+  case ctx of
+    Emp ->
+      oneof
+        [ ESucc <$> subExp,
+          EAdd <$> subExp <*> subExp,
+          EMul <$> subExp <*> subExp,
+          EIf <$> subExp <*> subExp <*> subExp,
+          ETuple <$> subExp <*> subExp,
+          EFst <$> subExp,
+          ESnd <$> subExp,
+          do
+            x <- arbitrary
+            ty <- arbitrary
+            ELam x ty <$> arbExpCtx (n `div` (m + 1)) (Snoc ctx (x, ty)),
+          EApp <$> subExp <*> subExp
+        ]
+    Snoc ctx' (y, _) ->
+      oneof
+        [ ESucc <$> subExp,
+          EAdd <$> subExp <*> subExp,
+          EMul <$> subExp <*> subExp,
+          EIf <$> subExp <*> subExp <*> subExp,
+          ETuple <$> subExp <*> subExp,
+          EFst <$> subExp,
+          ESnd <$> subExp,
+          EVar <$> arbName y ctx',
+          do
+            x <- arbitrary
+            ty <- arbitrary
+            ELam x ty <$> arbExpCtx (n `div` m + 1) (Snoc ctx (x, ty)),
+          EApp <$> subExp <*> subExp
+        ]
+
+arbExp :: Int -> Gen Exp
+arbExp n = arbExpCtx n Emp
 
 instance PP.Pretty Ty where
   pretty = prettyTy
@@ -106,8 +155,8 @@ instance Show Ty where
 
 prettyTy :: Ty -> PP.Doc ann
 prettyTy TNat = PP.pretty "ℕ"
-prettyTy TBool = PP.pretty "𝔹"
-prettyTy TUnit = PP.pretty "𝕌"
+prettyTy TBool = PP.pretty "𝟐"
+prettyTy TUnit = PP.pretty "𝟏"
 prettyTy (TProd ty1 ty2) = PP.pretty "(" <+> prettyTy ty1 <+> PP.pretty "×" <+> prettyTy ty2 <+> PP.pretty ")"
 prettyTy (TFun ty1 ty2) = PP.pretty "(" <+> prettyTy ty1 <+> PP.pretty "→" <+> prettyTy ty2 <+> PP.pretty ")"
 
