@@ -1,6 +1,7 @@
 -- | eval envuator for Extrinsic L5
 module Lang.L5.Eval.EEval where
 
+import Common.Types
 import Lang.L5.Syntax.Extrinsic (Exp (..), Name (..), Val (..))
 
 data Env
@@ -60,9 +61,10 @@ eval (EMul e1 e2) =
 eval (EIf e1 e2 e3) =
   do
     b1 <- eval e1
-    if b1 == VTrue
-      then eval e2
-      else eval e3
+    case b1 of
+      VTrue -> eval e2
+      VFalse -> eval e3
+      _ -> fail (show e1 ++ "has a type of" ++ show b1)
 eval EUnit = return VUnit
 eval (ETuple e1 e2) =
   do
@@ -106,3 +108,7 @@ subst x e (EAdd e1 e2) = EAdd (subst x e e1) (subst x e e2)
 subst x e (EMul e1 e2) = EMul (subst x e e1) (subst x e e2)
 subst x e (ESucc e') = ESucc (subst x e e')
 subst _ _ e = e
+
+fromNat :: Nat -> Exp
+fromNat Zero = EZero
+fromNat (Succ n) = ESucc (fromNat n)

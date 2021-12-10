@@ -1,10 +1,13 @@
-module Lang.L5.Typecheck where
+module Lang.L6.Typecheck where
 
 import Data.Either
-import Lang.L5.Syntax.Extrinsic
+import Lang.L6.Syntax.Extrinsic
 import Test.QuickCheck
 
-newtype TcTyExp = TcTyExp {tcgetExp :: Exp}
+data TcTyExp = TcTyExp {tcgetTy :: Ty, tcgetExp :: Exp}
+  deriving (Eq, Show)
+
+data TyExp = TyExp {getTy :: Ty, getExp :: Exp}
   deriving (Eq, Show)
 
 newtype TC a = TC {runTC :: Ctx -> Either TCError a}
@@ -60,7 +63,18 @@ tcextend :: Name -> Ty -> TC a -> TC a
 tcextend name ty (TC f) = TC $ \ctx -> f (extendCtx name ty ctx)
 
 instance Arbitrary TcTyExp where
-  arbitrary = TcTyExp <$> (arbitrary `suchThat` \e -> tcisSuccess $ tcinfer e)
+  arbitrary =
+    arbitrary `suchThatMap` \e ->
+      case runTC (tcinfer e) Emp of
+        Left _ -> Nothing
+        Right ty -> Just $ TcTyExp ty e
+
+instance Arbitrary TyExp where
+  arbitrary =
+    sized $ \n -> do
+      ty <- arbitrary
+      e <- arbExpCtxTy n Emp ty
+      pure (TyExp ty e)
 
 --TC Check
 tccheck :: Exp -> Ty -> TC ()
@@ -71,16 +85,6 @@ tccheck (ESucc e) TNat =
     return ()
 tccheck ETrue TBool = return ()
 tccheck EFalse TBool = return ()
-tccheck (EAdd e1 e2) TNat =
-  do
-    _ <- tccheck e1 TNat
-    _ <- tccheck e2 TNat
-    return ()
-tccheck (EMul e1 e2) TNat =
-  do
-    _ <- tccheck e1 TNat
-    _ <- tccheck e2 TNat
-    return ()
 tccheck (EIf e1 e2 e3) ty =
   do
     _ <- tccheck e1 TBool
@@ -122,6 +126,12 @@ tccheck (EApp e1 e2) ty =
     if ty2 == ty
       then return ()
       else tcfail ("check: the type of " ++ show (EApp e1 e2) ++ "is " ++ show ty2 ++ ", not " ++ show ty)
+tccheck (ERec e1 e2 e3) ty =
+  do
+    _ <- tccheck e1 ty
+    _ <- tccheck e2 (TFun ty ty)
+    _ <- tccheck e3 TNat
+    return ()
 tccheck e ty = tcfail ("check: " ++ show e ++ " is not an expression of type " ++ show ty ++ "!")
 
 --TC infer
@@ -133,16 +143,6 @@ tcinfer (ESucc e) =
     return TNat
 tcinfer ETrue = return TBool
 tcinfer EFalse = return TBool
-tcinfer (EAdd e1 e2) =
-  do
-    _ <- tccheck e1 TNat
-    _ <- tccheck e2 TNat
-    return TNat
-tcinfer (EMul e1 e2) =
-  do
-    _ <- tccheck e1 TNat
-    _ <- tccheck e2 TNat
-    return TNat
 tcinfer (EIf e1 e2 e3) =
   do
     _ <- tccheck e1 TBool
@@ -182,3 +182,24 @@ tcinfer (EApp e1 e2) =
     TFun ty1 ty2 <- tcinfer e1
     _ <- tccheck e2 ty1
     return ty2
+tcinfer (ERec e1 e2 e3) =
+  do
+    ty1 <- tcinfer e1
+    _ <- tccheck e2 (TFun ty1 ty1)
+    _ <- tccheck e3 TNat
+    return ty1
+
+fv :: Exp -> [Name]
+fv EZero = []
+fv (ESucc e) = fv e
+fv ETrue = []
+fv EFalse = []
+fv (EIf e1 e2 e3) = fv e1 ++ fv e2 ++ fv e3
+fv EUnit = []
+fv (ETuple e1 e2) = fv e1 ++ fv e2
+fv (EFst e) = fv e
+fv (ESnd e) = fv e
+fv (EVar x) = [x]
+fv (ELam x _ e) = [y | y <- fv e, y /= x]
+fv (EApp e1 e2) = fv e1 ++ fv e2
+fv (ERec e1 e2 e3) = fv e1 ++ fv e2 ++ fv e3

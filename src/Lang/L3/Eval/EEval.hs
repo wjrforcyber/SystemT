@@ -24,6 +24,7 @@ eval (EMul e1 e2) =
 eval (EIf e1 e2 e3) =
   do
     b1 <- eval e1
-    if b1 == VTrue
-      then eval e2
-      else eval e3
+    case b1 of
+      VTrue -> eval e2
+      VFalse -> eval e3
+      _ -> fail (show e1 ++ "has a type of" ++ show b1)

@@ -25,7 +25,6 @@ instance Applicative TC where
   (TC (Right f)) <*> y = fmap f y
 
 instance Monad TC where
-  return x = TC (Right x)
   TC (Left x) >>= _ = TC (Left x)
   (TC (Right x)) >>= f = f x
 
