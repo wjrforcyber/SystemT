@@ -70,8 +70,8 @@ main =
       bgroup
         "expo"
         [ bench "expoHs" $ nf (L6.expoHs 2) 3,
-          bench "*doubleExp" $ nf LL6.evalStar (L6.EApp (L6.EApp expoExp (L6.fromNat 2)) (L6.fromNat 3)),
-          bench "doubleExp" $ nf (LL6.runEval (LL6.eval (L6.EApp (L6.EApp expoExp (L6.fromNat 2)) (L6.fromNat 3)))) LL6.Emp
+          bench "*expoExp" $ nf LL6.evalStar (L6.EApp (L6.EApp expoExp (L6.fromNat 2)) (L6.fromNat 3)),
+          bench "expoExp" $ nf (LL6.runEval (LL6.eval (L6.EApp (L6.EApp expoExp (L6.fromNat 2)) (L6.fromNat 3)))) LL6.Emp
         ],
       bgroup
         "fac"
