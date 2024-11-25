@@ -4,7 +4,7 @@
 ![Linelint](https://github.com/wjrforcyber/SystemT/actions/workflows/lint.yml/badge.svg)
 
 ## 📃Thesis
-- [Implementing System T in Haskell](https://wjrforcyber.github.io/ISIH.pdf)
+- [Implementing System T in Haskell](https://wjrforcyber.github.io/files/ISIH.pdf)
 
 ## ✍Abstract
 Computers are general-purpose computing devices, and programming languages enable programmers to talk to them. In the field of programming languages, we study the meta-theory of programming languages, such as, their expressivity, robustness, and efficiency.
